@@ -83,7 +83,7 @@ class LeftSide extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return SizedBox(
-        width: 60,
+        width: 65,
         child: Container(
             // 渐变颜色
             decoration: BoxDecoration(
