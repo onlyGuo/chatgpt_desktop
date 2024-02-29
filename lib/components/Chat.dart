@@ -1,16 +1,34 @@
+import 'dart:convert';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:chatgpt_desktop/components/chat/ChatInput.dart';
+import 'package:chatgpt_desktop/components/chat/ChatSettingController.dart';
 import 'package:chatgpt_desktop/components/chat/ChatSettings.dart';
 import 'package:chatgpt_desktop/components/chat/ChatTitle.dart';
+import 'package:chatgpt_desktop/entity/ChatItem.dart';
+import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Chat extends StatelessWidget {
 
   final String id;
 
-  const Chat({super.key, required this.id});
+  Chat({super.key, required this.id});
+
+  ChatSettingController controller = Get.put(ChatSettingController());
 
   @override
   Widget build(BuildContext context) {
+
+    Util.readFile('chats/$id.json').then((value) {
+      if(value.isEmpty){
+        value = jsonEncode(ChatItem(id: id, name: "New Chat", avatar: "", lastMessage: "", lastMessageTime: "", subtitle: "Empty Description"));
+        Util.writeFile('chats/$id.json', value);
+      }
+      controller.currentChat.value = ChatItem.fromJson(jsonDecode(value));
+    });
+
     return Container(
       color: Colors.transparent,
       child: Row(
@@ -23,7 +41,7 @@ class Chat extends StatelessWidget {
                   SizedBox(
                     height: 70,
                     child: MoveWindow(
-                      child: const ChatTitle(title: 'Chat Title', subtitle: 'subtitle', avatar: ''),
+                      child: Obx(() => ChatTitle(title: controller.currentChat.value.name, subtitle: controller.currentChat.value.subtitle.isEmpty ?'Empty Description' : controller.currentChat.value.subtitle, avatar: controller.currentChat.value.avatar)),
                     ),
                   ),
                   Divider(
@@ -38,52 +56,7 @@ class Chat extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    color: const Color.fromARGB(255, 252, 252, 252),
-                    height: 180,
-                    child: Column(
-                      children: [
-                        Divider(
-                          height: 1,
-                          color: Colors.grey.withOpacity(0.2),
-                        ),
-                        Container(
-                          child: Row(
-                            children: [
-                              IconButton(onPressed: (){}, icon: Icon(Icons.attach_file),),
-                              IconButton(onPressed: (){}, icon: Icon(Icons.camera_alt)),
-                              IconButton(onPressed: (){}, icon: Icon(Icons.cut)),
-                              Expanded(child: Container()),
-                              IconButton(onPressed: (){}, icon: Row(
-                                children: [
-                                  Icon(Icons.model_training),
-                                  const SizedBox(width: 5,),
-                                  Text('gpt-3.5-turbo')
-                                ],
-                              )),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Type a message, press Enter to send, press Shift+Enter to newline.',
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              style: const TextStyle(
-                                fontSize: 12,
-                              ),
-                              maxLines: 5,
-                            ),
-                          )
-                        )
-                      ],
-                    ),
-                  ),
+                  ChatInput(),
                 ],
               ),
             ),
@@ -91,7 +64,7 @@ class Chat extends StatelessWidget {
           Container(
             width: 240,
             color: const Color.fromARGB(255, 252, 252, 252),
-            child: ChatSettings(),
+            child: Obx(() => controller.currentChat.value.id == '-' ? Container() : ChatSettings()),
           ),
         ],
       ),

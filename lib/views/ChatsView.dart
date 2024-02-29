@@ -100,7 +100,25 @@ class ChatsView extends StatelessWidget {
         ),
         Expanded(child: Container(
           color: Colors.transparent,
-          child: Obx(() => Chat(id: chatHistoryController.selectedChatId.value)),
+          child: Obx(() => chatHistoryController.selectedChatId.value.isEmpty ? Container(
+            color: Colors.white,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.chat, size: 100, color: Colors.grey),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Welecome GPTCraft",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  )
+                ],
+              )
+            )
+          ) : Chat(id: chatHistoryController.selectedChatId.value)),
         ))
       ],
     );

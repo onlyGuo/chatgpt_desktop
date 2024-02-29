@@ -1,9 +1,27 @@
+import 'dart:convert';
+
 import 'package:chatgpt_desktop/components/Avatar.dart';
+import 'package:chatgpt_desktop/components/ChatHistoryController.dart';
+import 'package:chatgpt_desktop/components/chat/ChatSettingController.dart';
+import 'package:chatgpt_desktop/entity/ChatItem.dart';
+import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ChatSettings extends StatelessWidget {
 
+  // final ChatItem chat;
+
+  ChatSettings({Key? key,}) : super(key: key);
+
+  final ChatSettingController controller = Get.put(ChatSettingController());
+  final ChatHistoryController chatHistoryController = Get.put(ChatHistoryController());
+
+
   Widget build(BuildContext context) {
+    controller.name_controller.text = controller.currentChat.value.name;
+    controller.description_controller.text = controller.currentChat.value.subtitle;
+    controller.system_controller.text = controller.currentChat.value.system;
     return Container(
       decoration: const BoxDecoration(
         border: Border(
@@ -18,20 +36,55 @@ class ChatSettings extends StatelessWidget {
           const SizedBox(
             height: 50,
           ),
-          const Avatar(filePath: '', size: 80,),
+          Stack(
+            children: [
+              MaterialButton(
+                onPressed: (){
+                  Util.pickAndSaveImage().then((value) {
+                    controller.currentChat.update((val) {
+                      val!.avatar = value;
+                    });
+                    Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                    chatHistoryController.updateChatAvatar(controller.currentChat.value.id, value);
+                  });
+                },
+                // 外面禁止点击
+                shape: const CircleBorder(),
+                child: Avatar(filePath: controller.currentChat.value.avatar, size: 80,),
+              ),
+
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
           const SizedBox(
             height: 10,
           ),
-          const Text(
-            'Chat Title',
+          Obx(() => Text(
+            controller.currentChat.value.name,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
-          ),
-          const Text(
-            'Subtitle',
-            style: TextStyle(
+          )),
+          Text(
+            controller.currentChat.value.subtitle,
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 12,
             ),
@@ -49,7 +102,7 @@ class ChatSettings extends StatelessWidget {
                 // padding: const EdgeInsets.all(10),
                 child: ListView(
                   children: [
-                      TextField(
+                    TextField(
                       decoration: InputDecoration(
                         labelText: 'name',
                         hintText: 'Please enter name',
@@ -65,6 +118,15 @@ class ChatSettings extends StatelessWidget {
                         fontSize: 14,
                       ),
                       textInputAction: TextInputAction.done,
+                        // 绑定value
+                        controller: controller.name_controller,
+                        onChanged: (value) {
+                          controller.currentChat.update((val) {
+                            val!.name = value;
+                            chatHistoryController.updateChatName(val.id, value);
+                          });
+                          Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                        },
                     ),
                     Divider(
                       height: 1,
@@ -90,6 +152,13 @@ class ChatSettings extends StatelessWidget {
                         fontSize: 14,
                       ),
                       textInputAction: TextInputAction.done,
+                      controller: controller.description_controller,
+                      onChanged: (value) {
+                        controller.currentChat.update((val) {
+                          val!.subtitle = value;
+                        });
+                        Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                      },
                     ),
                     Divider(
                       height: 1,
@@ -138,21 +207,19 @@ class ChatSettings extends StatelessWidget {
                                       ),
                                       border: OutlineInputBorder(),
                                     ),
-
+                                    controller: controller.system_controller,
                                     maxLines: 20,
                                     minLines: 10,
                                     style: TextStyle(
                                       fontSize: 12,
                                     ),
-                                    onChanged: (text) {
-                                      // Handle the text input here
-                                      print('Input text: $text');
-                                    },
                                   ),
                                 ),
                                 actions: <Widget>[
                                   TextButton(
                                     onPressed: () {
+                                      controller.currentChat.value.system = controller.system_controller.text;
+                                      Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('Done'),
@@ -168,7 +235,7 @@ class ChatSettings extends StatelessWidget {
                             Expanded(
                               child: Container(
                                 padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                child: const Column(
+                                child: Column(
                                   // 左对齐
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -180,7 +247,7 @@ class ChatSettings extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      'Unset',
+                                      controller.currentChat.value.system.isEmpty ? 'Unset' : 'Already set',
                                       style: TextStyle(
                                         color: Colors.grey,
                                         fontSize: 12,

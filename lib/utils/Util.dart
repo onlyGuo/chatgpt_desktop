@@ -24,7 +24,10 @@ class Util{
 
     if (pickedFile != null) {
       final directory = await getApplicationCacheDirectory();
-      final File imageFile = File('${directory.path}/select-images/${pickedFile.path.split('/').last}');
+      final File imageFile = File('${directory.path}/select-images/${pickedFile.name}');
+      if(imageFile.existsSync() == false){
+        imageFile.createSync(recursive: true);
+      }
       await imageFile.writeAsBytes(await pickedFile.readAsBytes());
       return imageFile.path;
     }
@@ -38,7 +41,7 @@ class Util{
     if(imageFile.existsSync() == false){
       imageFile.createSync(recursive: true);
     }
-    await imageFile.writeAsBytes(content.codeUnits);
+    await imageFile.writeAsString(content);
   }
 
   static Future<String> readFile(String filename) async {

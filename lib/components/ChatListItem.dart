@@ -1,5 +1,7 @@
+import 'dart:io';
+
 import 'package:chatgpt_desktop/components/ChatHistoryController.dart';
-import 'package:chatgpt_desktop/entity/ChatItem.dart';
+import 'package:chatgpt_desktop/entity/ChatSimpleItem.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +9,7 @@ import "package:intl/intl.dart";
 
 class ChatListItem extends StatelessWidget{
 
-  final ChatItem item;
+  final ChatSimpleItem item;
 
   ChatListItem({super.key, required this.item});
 
@@ -43,7 +45,7 @@ class ChatListItem extends StatelessWidget{
             children: [
               if(item.avatar.isNotEmpty)
                 CircleAvatar(
-                  backgroundImage: NetworkImage(item.avatar),
+                  backgroundImage: Image.file(File(item.avatar)).image,
                 )
               else
                 CircleAvatar(

@@ -17,6 +17,8 @@ class Avatar extends StatelessWidget {
         color: Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(size / 2),
       ),
+      // 超出隐藏
+      clipBehavior: Clip.antiAlias,
       child: filePath.isEmpty
           ? const Icon(
               Icons.person,

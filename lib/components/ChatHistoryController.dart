@@ -1,21 +1,21 @@
 import 'dart:convert';
 
+import 'package:chatgpt_desktop/entity/ChatSimpleItem.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:get/get.dart';
-import 'package:chatgpt_desktop/entity/ChatItem.dart';
 
 class ChatHistoryController extends GetxController{
   var selectedChatId = ''.obs;
 
-  RxList<ChatItem> items = RxList<ChatItem>([]);
+  RxList<ChatSimpleItem> items = RxList<ChatSimpleItem>([]);
 
   void addChat() => {
-    items.add(ChatItem(id: DateTime.now().millisecondsSinceEpoch.toString(), avatar: '', name: 'New Chat', lastMessage: '', lastMessageTime: '')),
+    items.add(ChatSimpleItem(id: DateTime.now().millisecondsSinceEpoch.toString(), avatar: '', name: 'New Chat', lastMessage: '', lastMessageTime: '')),
     Util.writeFile('history.json', jsonEncode(items)),
     update()
   };
 
-  void removeChat(ChatItem chat) => {
+  void removeChat(ChatSimpleItem chat) => {
     items.remove(chat),
     Util.writeFile('history.json', jsonEncode(items)),
     update()
@@ -27,12 +27,12 @@ class ChatHistoryController extends GetxController{
     Util.readFile('history.json').then((value) {
       if(value.isEmpty){
         value = jsonEncode([
-          ChatItem(id: '0', avatar: '', name: 'New Chat', lastMessage: '', lastMessageTime: ''),
+          ChatSimpleItem(id: '0', avatar: '', name: 'New Chat', lastMessage: '', lastMessageTime: ''),
         ]);
         Util.writeFile('history.json', value);
         selectedChatId.value = '0';
       }
-      jsonDecode(value).map<ChatItem>((item) => ChatItem.fromJson(item)).toList().forEach((element) {
+      jsonDecode(value).map<ChatSimpleItem>((item) => ChatSimpleItem.fromJson(item)).toList().forEach((element) {
         items.add(element);
       });
       update();  // 通知 Flutter 刷新 UI
@@ -42,6 +42,20 @@ class ChatHistoryController extends GetxController{
 
   void selectChat(String id){
     selectedChatId.value = id;
+    update();
+  }
+
+  void updateChatName(String id, String name){
+    items.firstWhere((element) => element.id == id).name = name;
+    items.refresh();
+    Util.writeFile('history.json', jsonEncode(items));
+    update();
+  }
+
+  void updateChatAvatar(String id, String value) {
+    items.firstWhere((element) => element.id == id).avatar = value;
+    items.refresh();
+    Util.writeFile('history.json', jsonEncode(items));
     update();
   }
 
