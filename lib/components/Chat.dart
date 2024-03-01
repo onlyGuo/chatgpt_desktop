@@ -5,9 +5,10 @@ import 'package:chatgpt_desktop/components/chat/ChatInput.dart';
 import 'package:chatgpt_desktop/components/chat/ChatSettingController.dart';
 import 'package:chatgpt_desktop/components/chat/ChatSettings.dart';
 import 'package:chatgpt_desktop/components/chat/ChatTitle.dart';
-import 'package:chatgpt_desktop/components/chat/message/ChatMessage.dart';
+import 'package:chatgpt_desktop/components/chat/message/ChatMessageWidget.dart';
 import 'package:chatgpt_desktop/controller/SettingController.dart';
 import 'package:chatgpt_desktop/entity/ChatItem.dart';
+import 'package:chatgpt_desktop/entity/ChatMessage.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,24 +55,49 @@ class Chat extends StatelessWidget {
                   Expanded(
                     child: Container(
                       color: const Color.fromARGB(255, 252, 252, 252),
-                      child: ListView(
-                        padding: const EdgeInsets.all(10),
-                        children: [
-                          Obx(() => ChatMessage(content: '用Java写个HelloWorld', nicker: settingController.setting.value.profileSetting.nicker, isMe: true, avatar: settingController.setting.value.profileSetting.avatar, time: ''),),
-                          Obx(() => ChatMessage(content: """好的
-```java
-public static void main(String[] args){
-  System.out.println("Hello World");
-
-}
-```
-这是一个用Java写的Hello world。""", nicker: controller.currentChat.value.name, isMe: false, avatar: controller.currentChat.value.avatar, time: ''),),
-                          
-                        ],
-                      ),
+                      child: Obx(() => ListView.builder(
+                        itemCount: controller.currentChat.value.history.length,
+                        itemBuilder: (context, index) {
+                          return buildChatMessage(controller.currentChat.value.history[index]);
+                        },
+                      ))
                     ),
                   ),
-                  ChatInput(),
+                  ChatInput(onFinish: (input, model){
+                    controller.currentChat.value.history.add(ChatMessage(content: input, role: 'user', time: ''));
+                    // 只保留最后50条消息
+                    if(controller.currentChat.value.history.length > 50){
+                      controller.currentChat.value.history =
+                          controller.currentChat.value.history
+                              .sublist(controller.currentChat.value.history.length - 50);
+                    }
+                    Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                    controller.currentChat.refresh();
+
+                    // build request message
+                    int dialogCount = controller.currentChat.value.dialogCount;
+                    int allLength = controller.currentChat.value.history.length;
+                    List<ChatMessage> reqMsg = allLength > dialogCount ?
+                    controller.currentChat.value.history.sublist(allLength - dialogCount) :
+                    controller.currentChat.value.history;
+
+                    // 请求GPT
+                    ChatMessage replyChatMessage = ChatMessage(content: '', role: 'assistant', time: '');
+                    controller.currentChat.update((val) {
+                      controller.currentChat.value.history.add(replyChatMessage);
+                    });
+
+                    Util.askGPT(settingController.setting.value.apiSetting.baseUrl,
+                        model, controller.currentChat.value.temperature,
+                        settingController.setting.value.apiSetting.accessToken, reqMsg, (result) {
+                          controller.currentChat.update((val) {
+                            replyChatMessage.content = result;
+                          });
+                          Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                        }, (err){
+                      print(err);
+                        });
+                  },),
                 ],
               ),
             ),
@@ -84,6 +110,14 @@ public static void main(String[] args){
         ],
       ),
     );
+  }
+
+  Widget buildChatMessage(ChatMessage message) {
+    return ChatMessageWidget(
+        content: message.content,
+        nicker: message.role == 'user' ? settingController.setting.value.profileSetting.nicker : controller.currentChat.value.name,
+        isMe: message.role == 'user',
+        avatar: message.role == 'user' ? settingController.setting.value.profileSetting.avatar : controller.currentChat.value.avatar, time: '');
   }
 
 

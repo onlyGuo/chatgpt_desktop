@@ -1,7 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:chatgpt_desktop/entity/ChatMessage.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 
 class Util{
@@ -52,4 +56,77 @@ class Util{
     }
     return file.readAsString();
   }
+
+  static void postStream(String url, Map<String, String> header, Map<String, dynamic> body, Function callback) async {
+    Uri uri = Uri.parse(url);
+    var request = http.Request('POST', uri);
+
+    request.body = jsonEncode(body);
+
+    Map<String, String> headers = {"Content-type": "application/json"};
+    headers.addAll(header);
+    http.Client client = http.Client();
+    client.head(uri, headers: headers);
+    client.send(request).then((response) {
+      response.stream.listen((List<int> data) {
+        print(data);
+      });
+    });
+  }
+
+
+  static void askGPT(String basicUrl, String model, double temperature, String accessKey, List<ChatMessage> message, GPTCallbackFunction callback, Function err) async {
+    final messages = [];
+    for (var m in message) {
+      messages.add({
+        "role": m.role,
+        "content": m.content,
+      });
+    }
+
+    final requestBody = {
+      "model": model,
+      "messages": messages,
+      "temperature": temperature,
+      "stream": true
+    };
+    basicUrl = basicUrl.endsWith('/') ? basicUrl : '$basicUrl/';
+    var request = http.Request("POST", Uri.parse('${basicUrl}v1/chat/completions'));
+    request.headers["Authorization"] = "Bearer $accessKey";
+    request.headers["Content-Type"] = "application/json; charset=UTF-8";
+    request.body = jsonEncode(requestBody);
+
+    // 开始请求
+    http.Client().send(request).then((response) {
+      String showContent = "";
+      final stream = response.stream.transform(utf8.decoder);
+      // 监听接收的数据
+      stream.listen((data) {
+        final dataLines = data.split("\n").where((element) => element.isNotEmpty).toList();
+        for (String line in dataLines) {
+          // 丢弃前6个字符：“data: ”
+          if (!line.startsWith("data: ")) continue;
+          final data = line.substring(6);
+
+          if (data == "[DONE]") break; // 表示接收已完成
+
+          // 解析数据
+          Map<String, dynamic> responseData = json.decode(data);
+          List<dynamic> choices = responseData["choices"];
+          Map<String, dynamic> choice = choices[0];
+          Map<String, dynamic> delta = choice["delta"];
+          String content = delta["content"] ?? "";
+
+          // 拼接并展示数据
+          showContent += content;
+          callback(showContent);
+          if (choice["finish_reason"] != null) break; // 表示接收已完成
+        }
+      },
+        onDone: () => callback(showContent),
+        onError: (error) => err(error),
+      );
+    });
+  }
 }
+typedef GPTCallbackFunction = void Function(String result);

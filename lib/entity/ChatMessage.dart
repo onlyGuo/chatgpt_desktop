@@ -1,7 +1,7 @@
 class ChatMessage {
-  final String content;
-  final String role;
-  final String time;
+  String content;
+  String role;
+  String time;
 
   ChatMessage({
     required this.content,
