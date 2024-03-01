@@ -121,7 +121,7 @@ class ChatSettings extends StatelessWidget {
                 children: [
                   TextField(
                     decoration: InputDecoration(
-                      labelText: 'name',
+                      labelText: 'Name',
                       hintText: 'Please enter name',
                       hintStyle: TextStyle(
                         color: Colors.grey.withOpacity(0.5),

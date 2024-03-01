@@ -5,6 +5,8 @@ import 'package:chatgpt_desktop/components/chat/ChatInput.dart';
 import 'package:chatgpt_desktop/components/chat/ChatSettingController.dart';
 import 'package:chatgpt_desktop/components/chat/ChatSettings.dart';
 import 'package:chatgpt_desktop/components/chat/ChatTitle.dart';
+import 'package:chatgpt_desktop/components/chat/message/ChatMessage.dart';
+import 'package:chatgpt_desktop/controller/SettingController.dart';
 import 'package:chatgpt_desktop/entity/ChatItem.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ class Chat extends StatelessWidget {
   Chat({super.key, required this.id});
 
   ChatSettingController controller = Get.put(ChatSettingController());
+  SettingController settingController = Get.put(SettingController());
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +54,20 @@ class Chat extends StatelessWidget {
                   Expanded(
                     child: Container(
                       color: const Color.fromARGB(255, 252, 252, 252),
-                      child: const Center(
-                        child: Text('Chat Content'),
+                      child: ListView(
+                        padding: const EdgeInsets.all(10),
+                        children: [
+                          Obx(() => ChatMessage(content: '用Java写个HelloWorld', nicker: settingController.setting.value.profileSetting.nicker, isMe: true, avatar: settingController.setting.value.profileSetting.avatar, time: ''),),
+                          Obx(() => ChatMessage(content: """好的
+```java
+public static void main(String[] args){
+  System.out.println("Hello World");
+
+}
+```
+这是一个用Java写的Hello world。""", nicker: controller.currentChat.value.name, isMe: false, avatar: controller.currentChat.value.avatar, time: ''),),
+                          
+                        ],
                       ),
                     ),
                   ),

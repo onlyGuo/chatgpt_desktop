@@ -93,5 +93,12 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  fonts:
+    - family: Hiragino Sans
+      fonts:
+        - asset: assets/fonts/Hiragino Sans GB.ttc
+    - family: iconfont
+      fonts:
+        - asset: assets/fonts/iconfont.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

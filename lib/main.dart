@@ -8,6 +8,7 @@ import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:chatgpt_desktop/views/AppsView.dart';
 import 'package:chatgpt_desktop/views/ChatsView.dart';
 import 'package:chatgpt_desktop/views/FriendsView.dart';
+import 'package:chatgpt_desktop/views/GitHubView.dart';
 import 'package:chatgpt_desktop/views/SettingView.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -129,6 +130,8 @@ class RightSide extends StatelessWidget {
               }
               if(controller.active.value == 'setting'){
                 return SettingView();
+              }if(controller.active.value == 'github'){
+                return GitHubView();
               }
               return Container();
             }),
