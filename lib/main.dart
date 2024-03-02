@@ -36,7 +36,7 @@ Future<void> main() async {
     win.minSize = initialSize;
     win.size = appWindow.size;
     win.alignment = Alignment.center;
-    win.title = "GPT-Desktop";
+    win.title = "GPTCraft";
     win.show();
   });
 }
