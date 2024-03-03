@@ -119,14 +119,14 @@ class Util{
 
           // 拼接并展示数据
           showContent += content;
-          callback(showContent);
+          callback(showContent, false);
           if (choice["finish_reason"] != null) break; // 表示接收已完成
         }
       },
-        onDone: () => callback(showContent),
+        onDone: () => callback(showContent, true),
         onError: (error) => err(error),
       );
     });
   }
 }
-typedef GPTCallbackFunction = void Function(String result);
+typedef GPTCallbackFunction = void Function(String result, bool finish);

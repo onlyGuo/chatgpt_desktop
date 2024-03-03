@@ -21,6 +21,7 @@ class Chat extends StatelessWidget {
 
   ChatSettingController controller = Get.put(ChatSettingController());
   SettingController settingController = Get.put(SettingController());
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +57,12 @@ class Chat extends StatelessWidget {
                     child: Container(
                       color: const Color.fromARGB(255, 252, 252, 252),
                       child: Obx(() => ListView.builder(
+                        reverse: true,
+                        controller: _scrollController,
                         itemCount: controller.currentChat.value.history.length,
                         itemBuilder: (context, index) {
-                          return buildChatMessage(controller.currentChat.value.history[index]);
+                          var history = controller.currentChat.value.history;
+                          return buildChatMessage(history[history.length - index - 1]);
                         },
                       ))
                     ),
@@ -86,14 +90,15 @@ class Chat extends StatelessWidget {
                     controller.currentChat.update((val) {
                       controller.currentChat.value.history.add(replyChatMessage);
                     });
-
                     Util.askGPT(settingController.setting.value.apiSetting.baseUrl,
                         model, controller.currentChat.value.temperature,
-                        settingController.setting.value.apiSetting.accessToken, reqMsg, (result) {
+                        settingController.setting.value.apiSetting.accessToken, reqMsg, (result, finish) {
                           controller.currentChat.update((val) {
                             replyChatMessage.content = result;
                           });
-                          Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                          if(finish){
+                            Util.writeFile('chats/${controller.currentChat.value.id}.json', jsonEncode(controller.currentChat.value));
+                          }
                         }, (err){
                       print(err);
                         });
