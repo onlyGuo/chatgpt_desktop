@@ -1,9 +1,9 @@
-<div style="text-align: center">
+<p align="center">
     <img src="https://raw.githubusercontent.com/onlyGuo/chatgpt_desktop/main/assets/chatgpt.png" />
     <h1>Welecome GPTCraft</h1>
-    <p>Cross platform GPT client developed using Flutter</p>
-</div>
-<p style="text-align: center">
+    <span>Cross platform GPT client developed using Flutter</span>
+</p>
+<p align="center">
   <a href="https://github.com/onlyGuo/chatgpt_desktop/blob/master/LICENSE">
     <img alt="code style" src="https://img.shields.io/github/license/onlyGuo/chatgpt_desktop.svg?style=popout">
   </a>
