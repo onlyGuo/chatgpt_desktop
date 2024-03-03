@@ -60,10 +60,12 @@ class ChatMessageWidget extends StatelessWidget {
                 //     fontFamily: 'Hiragino Sans',
                 //   ),
                 // ),
-                child: MarkdownBody(
-                  data: content,
-                  selectable: true,
-                  builders: {"code": CodeElementBuilder()},
+                child: SelectionArea(
+                  child: MarkdownBody(
+                    data: content,
+                    selectable: true,
+                    builders: {"code": CodeElementBuilder()},
+                  ),
                 ),
               ),
             ],
