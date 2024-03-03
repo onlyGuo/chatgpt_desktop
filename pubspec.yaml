@@ -41,6 +41,9 @@ dependencies:
   path_provider: ^2.0.2
   flutter_acrylic: ^1.1.3
   image_picker: ^1.0.7
+  http: ^1.2.0
+  flutter_markdown_selectionarea: ^0.6.17+1
+  flutter_highlighter: ^0.1.1
 
 dev_dependencies:
   flutter_test:
@@ -93,5 +96,12 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  fonts:
+    - family: Hiragino Sans
+      fonts:
+        - asset: assets/fonts/Hiragino Sans GB.ttc
+    - family: iconfont
+      fonts:
+        - asset: assets/fonts/iconfont.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
