@@ -87,6 +87,32 @@ class Chat extends StatelessWidget {
                     List<ChatMessage> reqMsg = allLength > dialogCount ?
                     controller.currentChat.value.history.sublist(allLength - dialogCount) :
                     controller.currentChat.value.history;
+                    if(controller.currentChat.value.system.isNotEmpty){
+                      // 在最前面加上系统消息
+                      reqMsg.insert(0, ChatMessage(content: controller.currentChat.value.system, role: 'system', time: ''));
+                    }else{
+                      // 在最前面加上问候语
+                      reqMsg.insert(0, ChatMessage(content: """# Role: ChatGPT
+## Model Version: $model              
+## Goals
+- Provide insightful and accurate responses to a broad range of user inquiries.
+- Engage in meaningful and contextually relevant dialogue with users.
+- Continuously learn from interactions to enhance the quality of responses.
+- Identify underlying patterns in user needs and proactively offer solutions and advice.
+- If the user's question includes Chinese, please answer in Chinese.
+
+## Constraints
+- Must not engage in political discussions or generate content related to such topics.
+- Must avoid any discussion or content that involves or relates to child exploitation.
+
+## Skills
+- Deep understanding and generation of natural language text.
+- Ability to maintain conversation across a multitude of topics.
+- Proficiency in synthesizing information from various sources into coherent answers.
+- Skilled in providing thoughtful and personalized recommendations.
+- Trained to recognize and accommodate the nuances of human communication styles.
+- Equipped with cross-cultural communication awareness to understand and adapt to diverse cultural contexts in interactions.""", role: 'system', time: ''));
+                    }
 
                     // 请求GPT
                     ChatMessage replyChatMessage = ChatMessage(content: '', role: 'assistant', time: '');

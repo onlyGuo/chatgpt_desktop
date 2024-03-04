@@ -99,9 +99,23 @@ class Util{
     // 开始请求
     http.Client().send(request).then((response) {
       String showContent = "";
+
       final stream = response.stream.transform(utf8.decoder);
       // 监听接收的数据
       stream.listen((data) {
+        if(response.statusCode != 200){
+          String finalData = data;
+          if(!finalData.endsWith("```")){
+            if(finalData.contains('<html>')) {
+              finalData = "\n```html\n$finalData\n```";
+            } else {
+              finalData = "\n```json\n$finalData\n```";
+            }
+          }
+          showContent += "Request failed: ${response.statusCode}\n$finalData";
+          callback(showContent, false);
+          return;
+        }
         final dataLines = data.split("\n").where((element) => element.isNotEmpty).toList();
         for (String line in dataLines) {
           // 丢弃前6个字符：“data: ”
@@ -123,7 +137,9 @@ class Util{
           if (choice["finish_reason"] != null) break; // 表示接收已完成
         }
       },
-        onDone: () => callback(showContent, true),
+        onDone: ()  {
+          callback(showContent, true);
+        },
         onError: (error) => err(error),
       );
     });

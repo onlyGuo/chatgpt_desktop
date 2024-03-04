@@ -1,5 +1,7 @@
+import 'package:chatgpt_desktop/enums/ModelEnums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 class ChatInput extends StatelessWidget{
   InputFinish? onFinish;
@@ -7,6 +9,9 @@ class ChatInput extends StatelessWidget{
 
   TextEditingController controller = TextEditingController();
   FocusNode focusNode = FocusNode();
+
+  var selectModel = ModelEnums.models.first.obs;
+
   @override
   Widget build(BuildContext context) {
     // controller.addListener(() {
@@ -30,23 +35,39 @@ class ChatInput extends StatelessWidget{
           Container(
             child: Row(
               children: [
-                IconButton(onPressed: (){}, icon: Icon(Icons.attach_file),),
-                IconButton(onPressed: (){}, icon: Icon(Icons.camera_alt)),
-                IconButton(onPressed: (){}, icon: Icon(Icons.cut)),
+                IconButton(onPressed: (){}, icon: Icon(Icons.attach_file), tooltip: 'Attach File'),
+                IconButton(onPressed: (){}, icon: Icon(Icons.camera_alt), tooltip: 'Attach Image'),
+                IconButton(onPressed: (){}, icon: Icon(Icons.cut), tooltip: 'Cut'),
                 Expanded(child: Container()),
-                IconButton(onPressed: (){}, icon: Row(
-                  children: [
-                    Icon(Icons.model_training),
-                    const SizedBox(width: 5,),
-                    Text('gpt-3.5-turbo')
-                  ],
+                Obx(() => DropdownButton<Model>(
+                  value: selectModel.value,
+                  items: ModelEnums.models
+                      .map((Model value) {
+                    return DropdownMenuItem<Model>(
+                      value: value,
+                      child: Text(value.displayName),
+                    );
+                  }).toList(),
+                  underline: Container(),
+                  onChanged: (newValue) {
+                    selectModel.value = newValue!;
+                  },
                 )),
+
+                // IconButton(onPressed: (){}, icon: Row(
+                //   children: [
+                //     Icon(Icons.model_training),
+                //     const SizedBox(width: 5,),
+                //     Text('gpt-3.5-turbo')
+                //   ],
+                // )),
               ],
             ),
           ),
           Expanded(
               child: Container(
-                padding: const EdgeInsets.all(10),
+                // padding: const EdgeInsets.all(5),
+                // color: Colors.red,
                 child: RawKeyboardListener(
                   focusNode: focusNode,
                   onKey: handleKeyPress,
@@ -88,7 +109,7 @@ class ChatInput extends StatelessWidget{
         String text = controller.text;
         controller.clear();
         if (onFinish != null) {
-          onFinish!(text, 'gpt-3.5-turbo');
+          onFinish!(text, selectModel.value.name);
         }
       }
     }
