@@ -41,7 +41,7 @@ You can download the latest version of GPTCraft from the [release page](https://
 - [x] Basic UI
 - [x] Integration of OpenAI
 - [x] Support for custom third-party API service providers
-- [ ] Model switching support
+- [x] Model switching support
 - [ ] Image upload support
 - [ ] Support for DALL-E image outputs
 - [ ] Support for plugins and the multimodal approach of official ChatGPT-Plus.
