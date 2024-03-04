@@ -68,6 +68,9 @@ class Chat extends StatelessWidget {
                     ),
                   ),
                   ChatInput(onFinish: (input, model){
+                    if(input.isEmpty){
+                      return;
+                    }
                     controller.currentChat.value.history.add(ChatMessage(content: input, role: 'user', time: ''));
                     // 只保留最后50条消息
                     if(controller.currentChat.value.history.length > 50){

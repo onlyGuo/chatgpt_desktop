@@ -11,7 +11,13 @@
     <img alt="code style" src="https://img.shields.io/github/license/onlyGuo/chatgpt_desktop.svg?style=popout">
   </a>
   <img alt="code style" src="https://img.shields.io/github/commit-activity/m/onlyGuo/chatgpt_desktop"/>
-  <img alt="code style" src="https://img.shields.io/github/downloads/onlyGuo/chatgpt_desktop/total"/>
+  <a href="https://github.com/onlyGuo/chatgpt_desktop/releases">
+    <img alt="code style" src="https://img.shields.io/github/downloads/onlyGuo/chatgpt_desktop/total"/>  
+  </a>
+  <a href="https://github.com/onlyGuo/chatgpt_desktop/releases">
+    <img alt="code style" src="https://img.shields.io/github/release-date/onlyGuo/chatgpt_desktop"/>  
+  </a>
+
 </p>
 
 GPTCraft is a cross-platform ChatGPT client developed in Flutter, designed to provide users with an interactive chat experience with the ChatGPT model.
@@ -27,3 +33,6 @@ GPTCraft is a cross-platform ChatGPT client developed in Flutter, designed to pr
 1. Download the suitable version for your platform from the release page.
 2. Launch the application and navigate to the system settings section labeled "API Setting."
 3. Enter your OpenAI Access Key in the designated field to configure the application.
+
+## Download
+You can download the latest version of GPTCraft from the [release page](https://github.com/onlyGuo/chatgpt_desktop/releases).
