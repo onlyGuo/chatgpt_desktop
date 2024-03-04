@@ -23,10 +23,28 @@ Future<void> main() async {
   await Window.initialize();
   // 判断是否是Linux
   if (!Platform.isLinux) {
-    await Window.setEffect(
-      effect: WindowEffect.acrylic,
-      color: Colors.transparent,
-    );
+    // 判断是Windows10 1803以上版本
+    if(Platform.isWindows){
+      await Window.setEffect(
+        // effect: WindowEffect.acrylic,
+        effect: WindowEffect.solid,
+        color: Colors.transparent,
+      );
+      if(Platform.operatingSystemVersion.contains('(')){
+        var version = Platform.operatingSystemVersion.split('(')[1].split(')')[0].toLowerCase().replaceAll('build', '').trim();
+        if(int.parse(version) > 17134){
+          await Window.setEffect(
+            effect: WindowEffect.acrylic,
+            color: Colors.transparent,
+          );
+        }
+      }
+    }else{
+      await Window.setEffect(
+        effect: WindowEffect.acrylic,
+        color: Colors.transparent,
+      );
+    }
   }
   appWindow.size = const Size(1000, 650);
   runApp(const MyApp());
