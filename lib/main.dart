@@ -30,9 +30,10 @@ Future<void> main() async {
         effect: WindowEffect.solid,
         color: Colors.transparent,
       );
+
       if(Platform.operatingSystemVersion.contains('(')){
         var version = Platform.operatingSystemVersion.split('(')[1].split(')')[0].toLowerCase().replaceAll('build', '').trim();
-        if(int.parse(version) > 17134){
+        if(int.parse(version) > 19045){
           await Window.setEffect(
             effect: WindowEffect.acrylic,
             color: Colors.transparent,
