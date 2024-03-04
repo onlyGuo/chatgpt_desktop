@@ -36,3 +36,20 @@ GPTCraft is a cross-platform ChatGPT client developed in Flutter, designed to pr
 
 ## Download
 You can download the latest version of GPTCraft from the [release page](https://github.com/onlyGuo/chatgpt_desktop/releases).
+
+## Iterative Plan
+- [x] Basic UI
+- [x] Integration of OpenAI
+- [x] Support for custom third-party API service providers
+- [ ] Model switching support
+- [ ] Image upload support
+- [ ] Support for DALL-E image outputs
+- [ ] Support for plugins and the multimodal approach of official ChatGPT-Plus.
+- [ ] Image upload support
+- [ ] Session cleanup support
+- [ ] Session editing support
+- [ ] Voice output support
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=onlyGuo/chatgpt_desktop&type=Date)](https://star-history.com/#onlyGuo/chatgpt_desktop&Date)
