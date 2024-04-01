@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:chatgpt_desktop/components/chat/message/my_flutter_highighter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/themes/github.dart';
@@ -21,7 +22,8 @@ class CodeHightLightView extends StatefulWidget {
 class _CodeHightLightViewState extends State<CodeHightLightView> {
   @override
   Widget build(BuildContext context) {
-    return HighlightView(
+    return MyHighlightView(
+
       // The original code to be highlighted
       widget.content,
 
@@ -35,6 +37,8 @@ class _CodeHightLightViewState extends State<CodeHightLightView> {
 
       // Specify padding
       padding: const EdgeInsets.all(8),
+
+
 
       // Specify text style
       textStyle: const TextStyle(
@@ -52,7 +56,15 @@ class CodeElementBuilder extends MarkdownElementBuilder {
       String lg = element.attributes['class'] as String;
       language = lg.substring(9);
     } else {
-      language = 'javascript';
+      return Container(
+        padding: const EdgeInsets.only(left: 5, right: 5, top: 1, bottom: 1),
+        margin: const EdgeInsets.only(top: 2, bottom: 2),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(220, 220, 220, 0.5),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(element.textContent.replaceAll("\n", "")),
+      );
     }
     return CodeHightLightView(
       content: element.textContent,
