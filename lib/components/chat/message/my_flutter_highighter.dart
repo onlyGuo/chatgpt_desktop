@@ -95,7 +95,6 @@ class MyHighlightView extends StatelessWidget {
       width: double.infinity,
       child: Text.rich(
         TextSpan(
-          text: source,
           style: _textStyle,
           children:
           _convert(highlight.parse(source, language: language).nodes!),
