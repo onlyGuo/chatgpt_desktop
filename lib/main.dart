@@ -117,7 +117,7 @@ class LeftSide extends StatelessWidget {
           // color: Color.fromARGB(150, 53, 36, 77),
             child: Column(
               children: [
-                WindowTitleBarBox(child: MoveWindow()),
+                // WindowTitleBarBox(child: MoveWindow()),
                 Expanded(child: child),
               ],
             )));

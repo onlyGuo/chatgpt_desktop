@@ -1,3 +1,4 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:chatgpt_desktop/components/Avatar.dart';
 import 'package:chatgpt_desktop/controller/SettingController.dart';
 import 'package:chatgpt_desktop/utils/MyIcons.dart';
@@ -19,6 +20,9 @@ class MainMenu extends StatelessWidget {
 
     return Column(
       children: [
+        SizedBox(height: 35,
+          child: WindowTitleBarBox(child: MoveWindow()),
+        ),
         Obx(() => Avatar(filePath: settingController.setting.value.profileSetting.avatar, size: 40,)),
         // ClipRRect(
         //   borderRadius: BorderRadius.circular(20.0), // 圆角
