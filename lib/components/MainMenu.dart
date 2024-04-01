@@ -9,7 +9,7 @@ class MainMenu extends StatelessWidget {
 
   final MainMenuController controller = Get.put(MainMenuController());
 
-  Color textColor = const Color.fromARGB(255, 115, 98, 140);
+  Color textColor = const Color.fromARGB(150, 255, 255, 255);
   SettingController settingController = Get.put(SettingController());
 
   @override
