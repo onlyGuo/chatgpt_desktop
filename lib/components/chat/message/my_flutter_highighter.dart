@@ -89,10 +89,25 @@ class MyHighlightView extends StatelessWidget {
     }
 
     return Container(
-      color: theme[_rootKey]?.backgroundColor ?? _defaultBackgroundColor,
+
       padding: padding,
       // 宽度撑满
       width: double.infinity,
+      // 圆角
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5.0),
+        color: theme[_rootKey]?.backgroundColor ?? _defaultBackgroundColor,
+        // 海拔
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 1,
+            offset: const Offset(0, 1), // changes position of shadow
+          ),
+        ],
+      ),
+
       child: Text.rich(
         TextSpan(
           style: _textStyle,

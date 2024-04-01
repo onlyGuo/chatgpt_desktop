@@ -2,8 +2,7 @@
 
 import 'package:chatgpt_desktop/components/chat/message/my_flutter_highighter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_highlighter/flutter_highlighter.dart';
-import 'package:flutter_highlighter/themes/github.dart';
+import 'package:flutter_highlighter/themes/atom-one-dark.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown_selectionarea.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -33,7 +32,7 @@ class _CodeHightLightViewState extends State<CodeHightLightView> {
 
       // Specify highlight theme
       // All available themes are listed in `themes` folder
-      theme: githubTheme,
+      theme: atomOneDarkTheme,
 
       // Specify padding
       padding: const EdgeInsets.all(8),
@@ -56,6 +55,9 @@ class CodeElementBuilder extends MarkdownElementBuilder {
       String lg = element.attributes['class'] as String;
       language = lg.substring(9);
     } else {
+      language = 'plaintext';
+    }
+    if(element.children != null && element.children?.length == 1 && !element.textContent.contains('\n')) {
       return Container(
         padding: const EdgeInsets.only(left: 5, right: 5, top: 1, bottom: 1),
         margin: const EdgeInsets.only(top: 2, bottom: 2),
@@ -63,11 +65,11 @@ class CodeElementBuilder extends MarkdownElementBuilder {
           color: const Color.fromRGBO(220, 220, 220, 0.5),
           borderRadius: BorderRadius.circular(5),
         ),
-        child: Text(element.textContent.replaceAll("\n", "")),
+        child: Text(element.textContent),
       );
     }
     return CodeHightLightView(
-      content: element.textContent,
+      content: element.textContent.endsWith('\n') ? element.textContent.substring(0, element.textContent.length - 1) : element.textContent,
       lang: language,
     );
   }
