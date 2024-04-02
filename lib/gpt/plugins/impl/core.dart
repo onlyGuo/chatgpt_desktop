@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:chatgpt_desktop/gpt/plugins/GPTPluginInterface.dart';
+import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class DrawPlugin extends GPTPluginInterface {
 
@@ -30,11 +33,29 @@ class DrawPlugin extends GPTPluginInterface {
   String get name => 'DALL·E-3';
 
   @override
-  String execute(String method, Map<String, dynamic> params) {
+  Future<String> execute(String method, Map<String, dynamic> params,
+      String basicUrl, String accessKey) {
     if(method == 'dall_e_draw'){
-      return '{url: "https://pica.zhimg.com/70/v2-e87aac6e0564dc8b8d98ab510dd8a77b_1440w.avis?source=172ae18b&biz_tag=Post", remark: "一只小猴子在树上玩耍。"}';
+      basicUrl = basicUrl.endsWith('/') ? basicUrl : '$basicUrl/';
+      try{
+        return Util.post('${basicUrl}v1/images/generations', {
+          "Authorization": "Bearer $accessKey",
+          "Content-Type": "application/json; charset=UTF-8"
+        }, {
+          "model": "dall-e-3",
+          "prompt": params['prompt'],
+          "n": 1,
+          "size": params['size'] ?? '1024x1024',
+          "quality": "standard",
+          "response_format": "url",
+          "style": "vivid"
+        });
+      }catch(e) {
+        print(e.toString());
+        return Future.value('');
+      }
     }
-    return '';
+    return Future.value('');
   }
 
   @override

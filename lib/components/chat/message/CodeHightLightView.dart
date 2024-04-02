@@ -93,6 +93,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
                 ],
               )
           ),
+          Expanded(child: Container(),),
         ],
       );
 

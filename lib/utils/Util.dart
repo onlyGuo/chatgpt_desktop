@@ -75,6 +75,23 @@ class Util{
     });
   }
 
+  static Future<String> post(String url, Map<String, String> header, Map<String, dynamic> body) async {
+    Uri uri = Uri.parse(url);
+    var request = http.Request('POST', uri);
+
+    request.body = jsonEncode(body);
+
+    Map<String, String> headers = {
+      // "Content-type": "application/json"
+    };
+    headers.addAll(header);
+    request.headers.addAll(headers);
+    http.Client client = http.Client();
+    return client.send(request).then((response) {
+      return response.stream.bytesToString();
+    });
+  }
+
 
   static void askGPT(String basicUrl, String model, double temperature,
       String accessKey, List<GPTPluginInterface> plugin, List<ChatMessage> message,
@@ -200,10 +217,12 @@ class Util{
                           )
                       )
                   ));
-                  String result = p.execute(method.name, jsonDecode(callFunctionParams));
-                  message.add(ChatMessage(content: result, role: 'tool', time: '', toolsCallId: callFunctionId));
-                  askGPT(basicUrl, model, temperature, accessKey, plugin, message, callback, err,
-                      bufferContent: showContent);
+                  Map<String, dynamic> functionParam = jsonDecode(callFunctionParams);
+                  p.execute(method.name, functionParam, basicUrl, accessKey).then((value) {
+                    message.add(ChatMessage(content: value, role: 'tool', time: '', toolsCallId: callFunctionId));
+                    askGPT(basicUrl, model, temperature, accessKey, plugin, message, callback, err,
+                        bufferContent: showContent);
+                  });
                   return;
                 }
               }

@@ -10,7 +10,8 @@ abstract class GPTPluginInterface {
   /// 插件方法
   List<GPTPluginMethod> get methods;
   /// 执行插件方法
-  String execute(String method, Map<String, dynamic> params);
+  Future<String> execute(String method, Map<String, dynamic> params,
+      String basicUrl, String accessKey);
 }
 
 class GPTPluginMethod{
