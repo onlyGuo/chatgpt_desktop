@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:chatgpt_desktop/entity/ChatMessage.dart';
+import 'package:chatgpt_desktop/gpt/plugins/GPTPluginInterface.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -74,22 +75,71 @@ class Util{
     });
   }
 
+  static Future<String> post(String url, Map<String, String> header, Map<String, dynamic> body) async {
+    Uri uri = Uri.parse(url);
+    var request = http.Request('POST', uri);
 
-  static void askGPT(String basicUrl, String model, double temperature, String accessKey, List<ChatMessage> message, GPTCallbackFunction callback, Function err) async {
+    request.body = jsonEncode(body);
+
+    Map<String, String> headers = {
+      // "Content-type": "application/json"
+    };
+    headers.addAll(header);
+    request.headers.addAll(headers);
+    http.Client client = http.Client();
+    return client.send(request).then((response) {
+      return response.stream.bytesToString();
+    });
+  }
+
+
+  static void askGPT(String basicUrl, String model, double temperature,
+      String accessKey, List<GPTPluginInterface> plugin, List<ChatMessage> message,
+      GPTCallbackFunction callback, Function err, {bufferContent = ''}) async {
     final messages = [];
     for (var m in message) {
-      messages.add({
-        "role": m.role,
-        "content": m.content,
-      });
-    }
+      if(m.toolsCallId.isNotEmpty){
+        messages.add({
+          "role": m.role,
+          "content": m.content,
+          "tool_call_id": m.toolsCallId
+        });
+      }else{
+        if(m.toolCalls != null){
+          messages.add({
+            "role": m.role,
+            "content": m.content,
+            "tool_calls": [m.toolCalls?.toMap()]
+          });
+        }else{
+          messages.add({
+            "role": m.role,
+            "content": m.content,
+          });
+        }
+      }
 
+    }
+    List<dynamic> tools = [];
     final requestBody = {
       "model": model,
       "messages": messages,
       "temperature": temperature,
-      "stream": true
+      "stream": true,
     };
+
+    // 添加插件
+    for (var p in plugin) {
+      for(var method in p.methods){
+        tools.add({
+          "type": "function",
+          "function": method.toMap(),
+        });
+      }
+    }
+    if(tools.isNotEmpty){
+      requestBody["tools"] = tools;
+    }
     basicUrl = basicUrl.endsWith('/') ? basicUrl : '$basicUrl/';
     var request = http.Request("POST", Uri.parse('${basicUrl}v1/chat/completions'));
     request.headers["Authorization"] = "Bearer $accessKey";
@@ -98,7 +148,10 @@ class Util{
 
     // 开始请求
     http.Client().send(request).then((response) {
-      String showContent = "";
+      String showContent = bufferContent;
+      String callFunctionId = "";
+      String callFunction = "";
+      String callFunctionParams = "";
 
       final stream = response.stream.transform(utf8.decoder);
       // 监听接收的数据
@@ -130,6 +183,18 @@ class Util{
           Map<String, dynamic> choice = choices[0];
           Map<String, dynamic> delta = choice["delta"];
           String content = delta["content"] ?? "";
+          if (delta["tool_calls"] != null && delta["tool_calls"].isNotEmpty) {
+            // 插件调用
+            var tool = delta["tool_calls"][0];
+            if(tool["function"] != null){
+              if(tool["function"]["name"] != null){
+                callFunction = tool["function"]["name"];
+                callFunctionId = tool["id"];
+                showContent += "\n\n```call-function\n$callFunction\n```\n";
+              }
+              callFunctionParams += tool["function"]["arguments"];
+            }
+          }
 
           // 拼接并展示数据
           showContent += content;
@@ -138,7 +203,33 @@ class Util{
         }
       },
         onDone: ()  {
-          callback(showContent, true);
+          if(callFunction.isNotEmpty){
+            // 执行插件方法
+            for (var p in plugin) {
+              for(var method in p.methods){
+                if(method.name == callFunction){
+                  message.add(ChatMessage(
+                      content: "", role: 'assistant', time: '',
+                      toolCalls: ToolCalls(
+                          id: callFunctionId, type: 'function',
+                          function: ToolCallsFunction(
+                              name: method.name, arguments: callFunctionParams
+                          )
+                      )
+                  ));
+                  Map<String, dynamic> functionParam = jsonDecode(callFunctionParams);
+                  p.execute(method.name, functionParam, basicUrl, accessKey).then((value) {
+                    message.add(ChatMessage(content: value, role: 'tool', time: '', toolsCallId: callFunctionId));
+                    askGPT(basicUrl, model, temperature, accessKey, plugin, message, callback, err,
+                        bufferContent: showContent);
+                  });
+                  return;
+                }
+              }
+            }
+          }else{
+            callback(showContent, true);
+          }
         },
         onError: (error) => err(error),
       );

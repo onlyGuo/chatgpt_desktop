@@ -9,6 +9,7 @@ import 'package:chatgpt_desktop/components/chat/message/ChatMessageWidget.dart';
 import 'package:chatgpt_desktop/controller/SettingController.dart';
 import 'package:chatgpt_desktop/entity/ChatItem.dart';
 import 'package:chatgpt_desktop/entity/ChatMessage.dart';
+import 'package:chatgpt_desktop/gpt/plugins/impl/core.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -121,7 +122,7 @@ class Chat extends StatelessWidget {
                     });
                     Util.askGPT(settingController.setting.value.apiSetting.baseUrl,
                         model, controller.currentChat.value.temperature,
-                        settingController.setting.value.apiSetting.accessToken, reqMsg, (result, finish) {
+                        settingController.setting.value.apiSetting.accessToken, [DrawPlugin()], reqMsg, (result, finish) {
                           controller.currentChat.update((val) {
                             replyChatMessage.content = result;
                           });

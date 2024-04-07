@@ -1,3 +1,4 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:chatgpt_desktop/components/Avatar.dart';
 import 'package:chatgpt_desktop/controller/SettingController.dart';
 import 'package:chatgpt_desktop/utils/MyIcons.dart';
@@ -9,7 +10,7 @@ class MainMenu extends StatelessWidget {
 
   final MainMenuController controller = Get.put(MainMenuController());
 
-  Color textColor = const Color.fromARGB(255, 115, 98, 140);
+  Color textColor = const Color.fromARGB(150, 255, 255, 255);
   SettingController settingController = Get.put(SettingController());
 
   @override
@@ -19,6 +20,9 @@ class MainMenu extends StatelessWidget {
 
     return Column(
       children: [
+        SizedBox(height: 35,
+          child: WindowTitleBarBox(child: MoveWindow()),
+        ),
         Obx(() => Avatar(filePath: settingController.setting.value.profileSetting.avatar, size: 40,)),
         // ClipRRect(
         //   borderRadius: BorderRadius.circular(20.0), // 圆角
