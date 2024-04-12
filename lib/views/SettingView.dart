@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingView extends StatelessWidget {
-  Color iconColor = const Color.fromARGB(255, 115, 98, 140);
-  Color textColor = const Color.fromARGB(255, 176, 155, 206);
-  Color selectColor = const Color.fromARGB(255, 146, 113, 182);
+  Color iconColor = const Color.fromARGB(255, 127, 92, 180);
+  Color textColor = const Color.fromARGB(255, 168, 126, 236);
+  Color selectColor = const Color.fromARGB(255, 103, 51, 145);
   Color bgDarkColor = const Color.fromARGB(255, 54, 37, 79);
 
   Color bgColor = const Color.fromARGB(150, 64, 46, 88);
@@ -74,10 +74,10 @@ class SettingView extends StatelessWidget {
                 ))),
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  child: SafeArea(
+                  child:  const SafeArea(
                     child: Row(
                       children: [
-                        Text('Settings', style: TextStyle(color: textColor)),
+                        Text('Settings', style: TextStyle(color: Colors.white)),
                       ],
                     ),
                   ),
@@ -333,7 +333,7 @@ You can use the custom API provider, and then enter the custom API base URL. For
   Widget buildItem(String name, IconData icon){
     return Container(
       decoration: BoxDecoration(
-        color: selectMenu.value == name ? selectColor.withOpacity(0.1) : Colors.transparent,
+        color: selectMenu.value == name ? selectColor.withOpacity(0.3) : Colors.transparent,
         border: Border(
           left: BorderSide(
             color: selectMenu.value == name ? selectColor : Colors.transparent,
@@ -346,8 +346,8 @@ You can use the custom API provider, and then enter the custom API base URL. For
           selectMenu.value = name;
         },
         child: ListTile(
-          title: Text(name, style: TextStyle(color: textColor),),
-          leading: Icon(icon, color: iconColor,),
+          title: Text(name, style: const TextStyle(color: Colors.white),),
+          leading: Icon(icon, color: Colors.white,),
         ),
       ),
     );

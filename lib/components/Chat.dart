@@ -9,6 +9,8 @@ import 'package:chatgpt_desktop/components/chat/message/ChatMessageWidget.dart';
 import 'package:chatgpt_desktop/controller/SettingController.dart';
 import 'package:chatgpt_desktop/entity/ChatItem.dart';
 import 'package:chatgpt_desktop/entity/ChatMessage.dart';
+import 'package:chatgpt_desktop/gpt/plugins/GPTPluginController.dart';
+import 'package:chatgpt_desktop/gpt/plugins/GPTPluginInterface.dart';
 import 'package:chatgpt_desktop/gpt/plugins/impl/core.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
@@ -85,9 +87,14 @@ class Chat extends StatelessWidget {
                     // build request message
                     int dialogCount = controller.currentChat.value.dialogCount;
                     int allLength = controller.currentChat.value.history.length;
-                    List<ChatMessage> reqMsg = allLength > dialogCount ?
-                    controller.currentChat.value.history.sublist(allLength - dialogCount) :
-                    controller.currentChat.value.history;
+                    List<ChatMessage> reqMsg = [];
+                    if(allLength > dialogCount){
+                      reqMsg = controller.currentChat.value.history.sublist(allLength - dialogCount);
+                    }else{
+                      for(ChatMessage msg in controller.currentChat.value.history){
+                        reqMsg.add(msg);
+                      }
+                    }
                     if(controller.currentChat.value.system.isNotEmpty){
                       // 在最前面加上系统消息
                       reqMsg.insert(0, ChatMessage(content: controller.currentChat.value.system, role: 'system', time: ''));
@@ -120,9 +127,18 @@ class Chat extends StatelessWidget {
                     controller.currentChat.update((val) {
                       controller.currentChat.value.history.add(replyChatMessage);
                     });
+
+                    // 加载插件
+                    List<GPTPluginInterface> plugins = [];
+                    for(GPTPluginInterface plugin in GPTPluginController.plugins){
+                      if(controller.currentChat.value.plugins.contains(plugin.name)){
+                        plugins.add(plugin);
+                      }
+                    }
+
                     Util.askGPT(settingController.setting.value.apiSetting.baseUrl,
                         model, controller.currentChat.value.temperature,
-                        settingController.setting.value.apiSetting.accessToken, [DrawPlugin()], reqMsg, (result, finish) {
+                        settingController.setting.value.apiSetting.accessToken, plugins, reqMsg, (result, finish) {
                           controller.currentChat.update((val) {
                             replyChatMessage.content = result;
                           });

@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 class DrawPlugin extends GPTPluginInterface {
 
   @override
-  String get description => 'Draw a picture using DALL·E-3. return the image path and remark.';
+  String get description => 'Draw a picture using DALL·E-3. Not recommended to use the GPT3.5 ';
 
   @override
   List<GPTPluginMethod> get methods {

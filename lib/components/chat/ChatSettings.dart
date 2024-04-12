@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:chatgpt_desktop/components/Avatar.dart';
 import 'package:chatgpt_desktop/components/ChatHistoryController.dart';
 import 'package:chatgpt_desktop/components/chat/ChatSettingController.dart';
+import 'package:chatgpt_desktop/components/chat/PluginItem.dart';
 import 'package:chatgpt_desktop/entity/ChatItem.dart';
+import 'package:chatgpt_desktop/gpt/plugins/impl/core.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -291,13 +293,20 @@ class ChatSettings extends StatelessWidget {
                   ),
                   MaterialButton(
                     onPressed: (){
-                      // 弹出消息Not implemented.
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Not implemented.'),
-                            content: const Text('This feature is not implemented yet. Please watch for the latest version.'),
+                            title: const Text('Select Plugins'),
+                            content: Container(
+                              width: 300,
+                              height: 300,
+                              child: ListView(
+                                children: [
+                                  PluginItem(plugin: DrawPlugin()),
+                                ],
+                              ),
+                            ),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
@@ -316,11 +325,11 @@ class ChatSettings extends StatelessWidget {
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.only(top: 10, bottom: 10),
-                            child: const Column(
+                            child: Column(
                               // 左对齐
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Plugins',
                                   style: TextStyle(
                                     fontSize: 12,
@@ -328,8 +337,9 @@ class ChatSettings extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'Not implemented.',
-                                  style: TextStyle(
+                                  controller.currentChat.value.plugins.isEmpty ?
+                                  'Select plugins for this chat' : '${controller.currentChat.value.plugins.length} plugins selected',
+                                  style: const TextStyle(
                                     color: Colors.grey,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,

@@ -18,7 +18,7 @@ class ChatListItem extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     Color textColor = const Color.fromARGB(255, 176, 155, 206);
-    Color selectColor = const Color.fromARGB(255, 146, 113, 182);
+    Color selectColor = const Color.fromARGB(255, 103, 51, 145);
 
     return Listener(
       onPointerDown: (details) {
@@ -33,7 +33,7 @@ class ChatListItem extends StatelessWidget{
               ? Border(left: BorderSide(color: selectColor, width: 3))
               : const Border(left: BorderSide(color: Colors.transparent, width: 3)),
           color: controller.selectedChatId.value == item.id
-              ? selectColor.withOpacity(0.1)
+              ? selectColor.withOpacity(0.3)
               : Colors.transparent,
         ),
         child: MaterialButton(onPressed: () {

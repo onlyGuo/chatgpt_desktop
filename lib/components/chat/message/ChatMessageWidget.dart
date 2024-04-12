@@ -1,5 +1,6 @@
 import 'package:chatgpt_desktop/components/Avatar.dart';
 import 'package:chatgpt_desktop/components/chat/message/CodeHightLightView.dart';
+import 'package:chatgpt_desktop/components/chat/message/ImageElementBuilder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown_selectionarea.dart';
 
@@ -64,7 +65,7 @@ class ChatMessageWidget extends StatelessWidget {
                   child: MarkdownBody(
                     data: content,
                     selectable: true,
-                    builders: {"code": CodeElementBuilder()},
+                    builders: {"code": CodeElementBuilder(), "img": ImageElementBuilder()},
                   ),
                 ),
               ),
