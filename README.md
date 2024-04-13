@@ -43,11 +43,10 @@ You can download the latest version of GPTCraft from the [release page](https://
 - [x] Support for custom third-party API service providers
 - [x] Model switching support
 - [ ] Image upload support
-- [ ] Support for DALL-E image outputs
+- [x] Support for DALL-E image outputs
 - [ ] Support for plugins and the multimodal approach of official ChatGPT-Plus.
-- [ ] Image upload support
 - [ ] Session cleanup support
-- [ ] Session editing support
+- [x] Session editing support
 - [ ] Voice output support
 
 ## Star History
