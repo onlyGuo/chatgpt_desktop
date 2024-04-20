@@ -44,7 +44,7 @@ You can download the latest version of GPTCraft from the [release page](https://
 - [x] Model switching support
 - [ ] Image upload support
 - [x] Support for DALL-E image outputs
-- [ ] Support for plugins and the multimodal approach of official ChatGPT-Plus.
+- [x] Support for plugins and the multimodal approach of official ChatGPT-Plus.
 - [ ] Session cleanup support
 - [x] Session editing support
 - [ ] Voice output support

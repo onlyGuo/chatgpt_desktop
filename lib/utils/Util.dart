@@ -216,7 +216,7 @@ class Util{
               if(tool["function"]["name"] != null){
                 callFunction = tool["function"]["name"];
                 callFunctionId = tool["id"];
-                showContent += "\n\n```call-function\n$callFunction\n```\n";
+                showContent += "\n\n```call-function\n$callFunction";
               }
               callFunctionParams += tool["function"]["arguments"];
             }
@@ -246,6 +246,7 @@ class Util{
                   Map<String, dynamic> functionParam = jsonDecode(callFunctionParams);
                   p.execute(method.name, functionParam, basicUrl, accessKey).then((value) {
                     message.add(ChatMessage(content: value, role: 'tool', time: '', toolsCallId: callFunctionId));
+                    showContent += '!end\n```\n';
                     askGPT(basicUrl, model, temperature, accessKey, plugin, message, callback, err,
                         bufferContent: showContent);
                   });

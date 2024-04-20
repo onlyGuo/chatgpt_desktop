@@ -37,6 +37,9 @@ class DrawPlugin extends GPTPluginInterface {
       String basicUrl, String accessKey) {
     if(method == 'dall_e_draw'){
       basicUrl = basicUrl.endsWith('/') ? basicUrl : '$basicUrl/';
+      if(params['size'] != null && !['1024x1024', '1792x1024', '1024x1792'].contains(params['size'])){
+        params['size'] = '1024x1024';
+      }
       try{
         return Util.post('${basicUrl}v1/images/generations', {
           "Authorization": "Bearer $accessKey",

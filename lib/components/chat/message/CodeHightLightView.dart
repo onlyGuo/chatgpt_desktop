@@ -71,30 +71,54 @@ class CodeElementBuilder extends MarkdownElementBuilder {
       );
     }
     if(language == 'call-function'){
-      GPTPluginInterface plugin = GPTPluginController.getByFunctionName(element.textContent.replaceAll("\n", ""));
-      return Row(
-        children: [
-          Container(
-              padding: const EdgeInsets.only(left: 5, right: 5, top: 3, bottom: 3),
-              margin: const EdgeInsets.only(top: 2, bottom: 2),
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(220, 220, 220, 0.5),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: plugin.icon,
-                  ),
-                  const SizedBox(width: 5,),
-                  Text(plugin.name),
-                ],
-              )
-          ),
-          Expanded(child: Container(),),
-        ],
+      String name = element.textContent.contains("!end") ?
+      element.textContent.substring(0, element.textContent.indexOf("!end")) : element.textContent;
+      GPTPluginInterface plugin = GPTPluginController.getByFunctionName(name.replaceAll("\n", ""));
+      return Container(
+        color: Colors.white,
+        child: Row(
+          children: [
+            Container(
+                padding: const EdgeInsets.only(left: 5, right: 5, top: 3, bottom: 3),
+                margin: const EdgeInsets.only(top: 2, bottom: 2),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(220, 220, 220, 0.5),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: plugin.icon,
+                        ),
+                        const SizedBox(width: 5,),
+                        Text(plugin.name),
+                      ],
+                    ),
+                    if(element.textContent.contains("!end"))
+                      const Row(
+                        children: [
+                          Icon(Icons.check, color: Colors.green, size: 12,),
+                          Text('Completed!', style: TextStyle(fontSize: 12, color: Colors.grey),),
+                        ],
+                      )
+                    else
+                      const Row(
+                        children: [
+                          Icon(Icons.timer, color: Colors.blue, size: 12,),
+                          Text('Running...', style: TextStyle(fontSize: 12, color: Colors.grey),),
+                        ],
+                      )
+                  ],
+                ),
+            ),
+            Expanded(child: Container())
+          ],
+        ),
       );
 
     }
