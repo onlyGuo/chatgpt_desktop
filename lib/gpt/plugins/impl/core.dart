@@ -68,3 +68,41 @@ class DrawPlugin extends GPTPluginInterface {
   }
 
 }
+
+class BingSearchPlugin extends GPTPluginInterface {
+
+  @override
+  String get description => 'Search information on the Internet through Bing';
+
+  @override
+  List<GPTPluginMethod> get methods {
+    return [
+      GPTPluginMethod('search_on_web_for_bing', 'Search information on the Internet through bing.', [
+        GPTPluginMethodParameter(
+            name: 'keyword',
+            type: 'string',
+            description: 'Search keywords, up to 30 words long'
+        ),
+      ]),
+    ];
+  }
+
+  @override
+  String get name => 'Bing Search';
+
+  @override
+  Future<String> execute(String method, Map<String, dynamic> params,
+      String basicUrl, String accessKey) {
+    if(method == 'search_on_web_for_bing'){
+      return Future.value('');
+    }
+    return Future.value('');
+  }
+
+  @override
+  // TODO: implement icon
+  Widget get icon {
+    return const Image(image: AssetImage('assets/plugins/draw.png'));
+  }
+
+}
