@@ -29,11 +29,16 @@ class SettingView extends StatelessWidget {
   FocusNode _baseUrlFocusNode = FocusNode();
   TextEditingController _baseUrl_controller = TextEditingController();
 
+  FocusNode _searchUrlFocusNode = FocusNode();
+  TextEditingController _searchUrlController = TextEditingController();
+
+  FocusNode _bingSearchAccessTokenFocusNode = FocusNode();
+  TextEditingController _bingSearchAccessToken_controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     _nicker_controller.text = controller.setting.value.profileSetting.nicker;
     _nickerFocusNode.addListener(() {
-      print(_nicker_controller.text);
       controller.setting.update((val) {
         val!.profileSetting.nicker = _nicker_controller.text;
       });
@@ -42,7 +47,6 @@ class SettingView extends StatelessWidget {
 
     _accessToken_controller.text = controller.setting.value.apiSetting.accessToken;
     _accessTokenFocusNode.addListener(() {
-      print(_accessToken_controller.text);
       controller.setting.update((val) {
         val!.apiSetting.accessToken = _accessToken_controller.text;
       });
@@ -51,9 +55,24 @@ class SettingView extends StatelessWidget {
 
     _baseUrl_controller.text = controller.setting.value.apiSetting.baseUrl;
     _baseUrlFocusNode.addListener(() {
-      print(_baseUrl_controller.text);
       controller.setting.update((val) {
         val!.apiSetting.baseUrl = _baseUrl_controller.text;
+      });
+      Util.writeFile('settings.json', jsonEncode(controller.setting.value));
+    });
+
+    _searchUrlController.text = controller.setting.value.apiSetting.bingSearchBaseUrl;
+    _searchUrlFocusNode.addListener(() {
+      controller.setting.update((val) {
+        val!.apiSetting.bingSearchBaseUrl = _searchUrlController.text;
+      });
+      Util.writeFile('settings.json', jsonEncode(controller.setting.value));
+    });
+
+    _bingSearchAccessToken_controller.text = controller.setting.value.apiSetting.bingSearchAccessToken;
+    _bingSearchAccessTokenFocusNode.addListener(() {
+      controller.setting.update((val) {
+        val!.apiSetting.bingSearchAccessToken = _bingSearchAccessToken_controller.text;
       });
       Util.writeFile('settings.json', jsonEncode(controller.setting.value));
     });
@@ -160,213 +179,245 @@ class SettingView extends StatelessWidget {
                 );
               } else if (selectMenu.value == 'Api Settings') {
                 return Container(
-                  margin: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.only(top: 30),
                   child: ListView(
                     // 左对齐
                     children: [
-                      const SizedBox(height: 20,),
-                      DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Select a server',
-                          prefixIcon: Icon(Icons.web, color: iconColor),
-                          helperText: 'Select a server to connect to the chat service.',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: textColor, width: 1),
+                      // const SizedBox(height: 20,),
+                      Container(
+                        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+                        child: Container(
+                          // 阴影
+                          decoration: BoxDecoration(
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        selectedItemBuilder: (BuildContext context) {
-                          return ['OpenAI', 'Custom'].map((String value) {
-                            return Text(value);
-                          }).toList();
-                        },
-                        alignment: Alignment.topLeft,
-                        value: controller.setting.value.apiSetting.isCustom ? 'Custom' : 'OpenAI',
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'OpenAI',
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('OpenAI'),
-                                Text('https://api.openai.com', style: TextStyle(color: Colors.grey),),
-                              ],
-                            )
-                          ),
-                          // DropdownMenuItem(
-                          //   value: 'iCoding',
-                          //   child: Column(
-                          //     mainAxisAlignment: MainAxisAlignment.start,
-                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       Text('iCoding'),
-                          //       Text('https://dev.icoding.ink', style: TextStyle(color: Colors.grey),),
-                          //     ],
-                          //   )
-                          // ),
-                          // DropdownMenuItem(
-                          //   value: 'ChatAnyWhere',
-                          //   child: Column(
-                          //     mainAxisAlignment: MainAxisAlignment.start,
-                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       Text('ChatAnyWhere'),
-                          //       Text('https://api.chatanywhere.tech', style: TextStyle(color: Colors.grey),),
-                          //     ],
-                          //   )
-                          // ),
-                          DropdownMenuItem(
-                            value: 'Custom',
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Custom'),
-                                Text('Please enter your custom server address', style: TextStyle(color: Colors.grey),),
-                              ],
-                            )
-                          ),
-
-                        ],
-                        onChanged: (value) {
-                          controller.setting.update((val) {
-                            val!.apiSetting.isCustom = value == 'Custom';
-                          });
-                          Util.writeFile('settings.json', jsonEncode(controller.setting.value));
-                        },
-                      ),
-
-                      if(controller.setting.value.apiSetting.isCustom)
-                        Column(
-                          children: [
-                            SizedBox(height: 20,),
-                            TextField(
-                              decoration: InputDecoration(
-                                disabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: textColor, width: 1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                hintText: 'Please enter your API base URL',
-                                labelText: 'Custom API base URL',
-                                prefixIcon: Icon(Icons.key, color: iconColor),
-                                helperText: 'Your API base URL will be used to access the chat service.',
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(color: textColor, width: 1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              controller: _baseUrl_controller,
-                              focusNode: _baseUrlFocusNode,
-                            ),
-                          ],
-                        ),
-
-                      const SizedBox(height: 20,),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Please enter your AccessToken',
-                          labelText: 'AccessToken',
-                          prefixIcon: Icon(Icons.key, color: iconColor),
-                          helperText: 'Your AccessToken will be used to access the chat service.',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: textColor, width: 1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        controller: _accessToken_controller,
-                        focusNode: _accessTokenFocusNode,
-                      ),
-
-                      const SizedBox(height: 20,),
-                      DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Select a Bing-Search server',
-                          prefixIcon: Icon(Icons.web, color: iconColor),
-                          helperText: 'Select a server to connect to the Bing-Search service',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: textColor, width: 1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        selectedItemBuilder: (BuildContext context) {
-                          return ['Azure', 'Custom'].map((String value) {
-                            return Text(value);
-                          }).toList();
-                        },
-                        alignment: Alignment.topLeft,
-                        value: controller.setting.value.apiSetting.bingSearchIsCustom ? 'Custom' : 'Azure',
-                        items: const [
-                          DropdownMenuItem(
-                              value: 'Azure',
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Azure'),
-                                  Text('https://api.bing.microsoft.com', style: TextStyle(color: Colors.grey),),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                offset: const Offset(0.0, 1.0), //阴影xy轴偏移量
+                                blurRadius: 8.0, //阴影模糊程度
+                                spreadRadius: 0.0, //阴影扩散程度
                               )
+                            ],
                           ),
-                          DropdownMenuItem(
-                              value: 'Custom',
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Custom'),
-                                  Text('Please enter your custom server address', style: TextStyle(color: Colors.grey),),
-                                ],
-                              )
-                          ),
-                        ],
-                        onChanged: (value) {
-                          controller.setting.update((val) {
-                            val!.apiSetting.bingSearchIsCustom = value == 'Custom';
-                          });
-                          Util.writeFile('settings.json', jsonEncode(controller.setting.value));
-                        },
-                      ),
-                      if(controller.setting.value.apiSetting.bingSearchIsCustom)
-                        Column(
-                          children: [
-                            SizedBox(height: 20,),
-                            TextField(
-                              decoration: InputDecoration(
-                                disabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: textColor, width: 1),
-                                  borderRadius: BorderRadius.circular(10),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            // 左对齐
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("GPT API Settings", style: TextStyle(color: textColor, fontSize: 20),),
+                              SizedBox(height: 10,),
+                              DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                  labelText: 'Select a server',
+                                  prefixIcon: Icon(Icons.web, color: iconColor),
+                                  helperText: 'Select a server to connect to the chat service.',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(color: textColor, width: 1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                hintText: 'Please enter your Bing-Search API base URL',
-                                labelText: 'Custom API base URL',
-                                prefixIcon: Icon(Icons.key, color: iconColor),
-                                helperText: 'Your API base URL will be used to access the Bing-Search service.',
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(color: textColor, width: 1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              controller: _baseUrl_controller,
-                              focusNode: _baseUrlFocusNode,
-                            ),
-                          ],
-                        ),
+                                selectedItemBuilder: (BuildContext context) {
+                                  return ['OpenAI', 'Custom'].map((String value) {
+                                    return Text(value);
+                                  }).toList();
+                                },
+                                alignment: Alignment.topLeft,
+                                value: controller.setting.value.apiSetting.isCustom ? 'Custom' : 'OpenAI',
+                                items: const [
+                                  DropdownMenuItem(
+                                      value: 'OpenAI',
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('OpenAI'),
+                                          Text('https://api.openai.com', style: TextStyle(color: Colors.grey),),
+                                        ],
+                                      )
+                                  ),
+                                  DropdownMenuItem(
+                                      value: 'Custom',
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Custom'),
+                                          Text('Please enter your custom server address', style: TextStyle(color: Colors.grey),),
+                                        ],
+                                      )
+                                  ),
 
-                      const SizedBox(height: 20,),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Please enter your AccessToken',
-                          labelText: 'AccessToken',
-                          prefixIcon: Icon(Icons.key, color: iconColor),
-                          helperText: 'Your AccessToken will be used to access the chat service.',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: textColor, width: 1),
-                            borderRadius: BorderRadius.circular(10),
+                                ],
+                                onChanged: (value) {
+                                  controller.setting.update((val) {
+                                    val!.apiSetting.isCustom = value == 'Custom';
+                                  });
+                                  Util.writeFile('settings.json', jsonEncode(controller.setting.value));
+                                },
+                              ),
+
+                              if(controller.setting.value.apiSetting.isCustom)
+                                Column(
+                                  children: [
+                                    SizedBox(height: 20,),
+                                    TextField(
+                                      decoration: InputDecoration(
+                                        disabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: textColor, width: 1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        hintText: 'Please enter your API base URL',
+                                        labelText: 'Custom API base URL',
+                                        prefixIcon: Icon(Icons.key, color: iconColor),
+                                        helperText: 'Your API base URL will be used to access the chat service.',
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(color: textColor, width: 1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      controller: _baseUrl_controller,
+                                      focusNode: _baseUrlFocusNode,
+                                    ),
+                                  ],
+                                ),
+
+                              const SizedBox(height: 20,),
+                              TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Please enter your AccessToken',
+                                  labelText: 'AccessToken',
+                                  prefixIcon: Icon(Icons.key, color: iconColor),
+                                  helperText: 'Your AccessToken will be used to access the chat service.',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(color: textColor, width: 1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                controller: _accessToken_controller,
+                                focusNode: _accessTokenFocusNode,
+                              ),
+                            ],
                           ),
                         ),
-                        controller: _accessToken_controller,
-                        focusNode: _accessTokenFocusNode,
                       ),
+                      const SizedBox(height: 5,),
+                      Container(
+                        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+                        child: Container(
+                          // 阴影
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                offset: const Offset(0.0, 1.0), //阴影xy轴偏移量
+                                blurRadius: 8.0, //阴影模糊程度
+                                spreadRadius: 0.0, //阴影扩散程度
+                              )
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            // 左对齐
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Bing-Search Plugin Settings", style: TextStyle(color: textColor, fontSize: 20),),
+                              SizedBox(height: 10,),
+                              DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                  labelText: 'Select a Bing-Search server',
+                                  prefixIcon: Icon(Icons.web, color: iconColor),
+                                  helperText: 'Select a server to connect to the Bing-Search service',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(color: textColor, width: 1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                selectedItemBuilder: (BuildContext context) {
+                                  return ['Azure', 'Custom'].map((String value) {
+                                    return Text(value);
+                                  }).toList();
+                                },
+                                alignment: Alignment.topLeft,
+                                value: controller.setting.value.apiSetting.bingSearchIsCustom ? 'Custom' : 'Azure',
+                                items: const [
+                                  DropdownMenuItem(
+                                      value: 'Azure',
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Azure'),
+                                          Text('https://api.bing.microsoft.com', style: TextStyle(color: Colors.grey),),
+                                        ],
+                                      )
+                                  ),
+                                  DropdownMenuItem(
+                                      value: 'Custom',
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Custom'),
+                                          Text('Please enter your custom server address', style: TextStyle(color: Colors.grey),),
+                                        ],
+                                      )
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  controller.setting.update((val) {
+                                    val!.apiSetting.bingSearchIsCustom = value == 'Custom';
+                                  });
+                                  Util.writeFile('settings.json', jsonEncode(controller.setting.value));
+                                },
+                              ),
+                              if(controller.setting.value.apiSetting.bingSearchIsCustom)
+                                Column(
+                                  children: [
+                                    SizedBox(height: 20,),
+                                    TextField(
+                                      decoration: InputDecoration(
+                                        disabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: textColor, width: 1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        hintText: 'Please enter your Bing-Search API base URL',
+                                        labelText: 'Bing-Search API base URL',
+                                        prefixIcon: Icon(Icons.key, color: iconColor),
+                                        helperText: 'Your API base URL will be used to access the Bing-Search service.',
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(color: textColor, width: 1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      controller: _searchUrlController,
+                                      focusNode: _searchUrlFocusNode,
+                                    ),
+                                  ],
+                                ),
+
+                              const SizedBox(height: 20,),
+                              TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Please enter your AccessToken',
+                                  labelText: 'Bing-Search AccessToken',
+                                  prefixIcon: Icon(Icons.key, color: iconColor),
+                                  helperText: 'Your AccessToken will be used to access the Bing-Search service.',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(color: textColor, width: 1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                controller: _bingSearchAccessToken_controller,
+                                focusNode: _bingSearchAccessTokenFocusNode,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20,),
                     ],
                   ),
                 );

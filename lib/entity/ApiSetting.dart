@@ -3,8 +3,10 @@ class ApiSetting{
   String baseUrl;
   bool isCustom;
   bool bingSearchIsCustom;
+  String bingSearchBaseUrl;
+  String bingSearchAccessToken;
 
-  ApiSetting({this.accessToken = '', this.baseUrl = '', this.isCustom = false, this.bingSearchIsCustom = false});
+  ApiSetting({this.accessToken = '', this.baseUrl = '', this.isCustom = false, this.bingSearchIsCustom = false, this.bingSearchBaseUrl = '', this.bingSearchAccessToken = ''});
 
   // toJson
   Map<String, dynamic> toJson() => {
@@ -12,6 +14,8 @@ class ApiSetting{
     'baseUrl': baseUrl,
     'isCustom': isCustom,
     'bingSearchIsCustom': bingSearchIsCustom,
+    'bingSearchBaseUrl': bingSearchBaseUrl,
+    'bingSearchAccessToken': bingSearchAccessToken,
   };
 
   // fromJson
@@ -21,6 +25,8 @@ class ApiSetting{
       baseUrl: json['baseUrl'],
       isCustom: json['isCustom'],
       bingSearchIsCustom: json['bingSearchIsCustom'] ?? false,
+      bingSearchBaseUrl: json['bingSearchBaseUrl'] ?? '',
+      bingSearchAccessToken: json['bingSearchAccessToken'] ?? '',
     );
   }
 
