@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:chatgpt_desktop/entity/ChatMessage.dart';
 import 'package:chatgpt_desktop/gpt/plugins/GPTPluginInterface.dart';
 import 'package:flutter/services.dart';
+import 'package:http/io_client.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -37,7 +38,11 @@ class Util{
     }
     Uri uri = Uri.parse(url);
     var request = http.Request('GET', uri);
-    http.Client client = http.Client();
+    // http.Client client = http.Client();
+    HttpClient httpClient = new HttpClient();
+    httpClient.badCertificateCallback =
+    ((X509Certificate cert, String host, int port) => true);
+    IOClient client = new IOClient(httpClient);
     return client.send(request).then((response) {
       return response.stream.toBytes().then((value) {
         return imageFile.writeAsBytes(value).then((value) {
@@ -90,7 +95,11 @@ class Util{
 
     Map<String, String> headers = {"Content-type": "application/json"};
     headers.addAll(header);
-    http.Client client = http.Client();
+    // http.Client client = http.Client();
+    HttpClient httpClient = new HttpClient();
+    httpClient.badCertificateCallback =
+    ((X509Certificate cert, String host, int port) => true);
+    IOClient client = new IOClient(httpClient);
     client.head(uri, headers: headers);
     client.send(request).then((response) {
       response.stream.listen((List<int> data) {
@@ -111,7 +120,12 @@ class Util{
     };
     headers.addAll(header);
     request.headers.addAll(headers);
-    http.Client client = http.Client();
+    // http.Client client = http.Client();
+    // 不校验证书
+    HttpClient httpClient = new HttpClient();
+    httpClient.badCertificateCallback =
+    ((X509Certificate cert, String host, int port) => true);
+    IOClient client = new IOClient(httpClient);
     return client.send(request).then((response) {
       return response.stream.bytesToString();
     });
@@ -173,7 +187,13 @@ class Util{
     request.body = jsonEncode(requestBody);
 
     // 开始请求
-    http.Client().send(request).then((response) {
+    // var client = http.Client();
+    // 不校验证书
+    HttpClient httpClient = new HttpClient();
+    httpClient.badCertificateCallback =
+    ((X509Certificate cert, String host, int port) => true);
+    IOClient ioClient = new IOClient(httpClient);
+    ioClient.send(request).then((response) {
       String showContent = bufferContent;
       String callFunctionId = "";
       String callFunction = "";
