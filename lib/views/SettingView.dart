@@ -262,7 +262,97 @@ class SettingView extends StatelessWidget {
                           ],
                         ),
 
-                      SizedBox(height: 20,),
+                      const SizedBox(height: 20,),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Please enter your AccessToken',
+                          labelText: 'AccessToken',
+                          prefixIcon: Icon(Icons.key, color: iconColor),
+                          helperText: 'Your AccessToken will be used to access the chat service.',
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: textColor, width: 1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        controller: _accessToken_controller,
+                        focusNode: _accessTokenFocusNode,
+                      ),
+
+                      const SizedBox(height: 20,),
+                      DropdownButtonFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Select a Bing-Search server',
+                          prefixIcon: Icon(Icons.web, color: iconColor),
+                          helperText: 'Select a server to connect to the Bing-Search service',
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: textColor, width: 1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        selectedItemBuilder: (BuildContext context) {
+                          return ['Azure', 'Custom'].map((String value) {
+                            return Text(value);
+                          }).toList();
+                        },
+                        alignment: Alignment.topLeft,
+                        value: controller.setting.value.apiSetting.bingSearchIsCustom ? 'Custom' : 'Azure',
+                        items: const [
+                          DropdownMenuItem(
+                              value: 'Azure',
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Azure'),
+                                  Text('https://api.bing.microsoft.com', style: TextStyle(color: Colors.grey),),
+                                ],
+                              )
+                          ),
+                          DropdownMenuItem(
+                              value: 'Custom',
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Custom'),
+                                  Text('Please enter your custom server address', style: TextStyle(color: Colors.grey),),
+                                ],
+                              )
+                          ),
+                        ],
+                        onChanged: (value) {
+                          controller.setting.update((val) {
+                            val!.apiSetting.bingSearchIsCustom = value == 'Custom';
+                          });
+                          Util.writeFile('settings.json', jsonEncode(controller.setting.value));
+                        },
+                      ),
+                      if(controller.setting.value.apiSetting.bingSearchIsCustom)
+                        Column(
+                          children: [
+                            SizedBox(height: 20,),
+                            TextField(
+                              decoration: InputDecoration(
+                                disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: textColor, width: 1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                hintText: 'Please enter your Bing-Search API base URL',
+                                labelText: 'Custom API base URL',
+                                prefixIcon: Icon(Icons.key, color: iconColor),
+                                helperText: 'Your API base URL will be used to access the Bing-Search service.',
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: textColor, width: 1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              controller: _baseUrl_controller,
+                              focusNode: _baseUrlFocusNode,
+                            ),
+                          ],
+                        ),
+
+                      const SizedBox(height: 20,),
                       TextField(
                         decoration: InputDecoration(
                           hintText: 'Please enter your AccessToken',
