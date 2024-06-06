@@ -9,6 +9,7 @@
 #include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
 #include <file_selector_windows/file_selector_windows.h>
 #include <flutter_acrylic/flutter_acrylic_plugin.h>
+#include <screen_capturer_windows/screen_capturer_windows_plugin_c_api.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   BitsdojoWindowPluginRegisterWithRegistrar(
@@ -17,4 +18,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("FileSelectorWindows"));
   FlutterAcrylicPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterAcrylicPlugin"));
+  ScreenCapturerWindowsPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("ScreenCapturerWindowsPluginCApi"));
 }

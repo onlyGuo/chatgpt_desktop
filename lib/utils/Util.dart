@@ -52,6 +52,20 @@ class Util{
     });
   }
 
+  static Future<String> saveImageFormByteData(ByteData byteData) async {
+    final directory = await getApplicationCacheDirectory();
+    File imageFile = File('${directory.path}/cache/${getMd5(DateTime.now().toString())}.png');
+    await imageFile.writeAsBytes(byteData.buffer.asUint8List());
+    return imageFile.path;
+  }
+
+  static Future<String> saveImageFormBytes(Uint8List imageBytes) async {
+    final directory = await getApplicationCacheDirectory();
+    File imageFile = File('${directory.path}/cache/${getMd5(DateTime.now().toString())}.png');
+    await imageFile.writeAsBytes(imageBytes);
+    return imageFile.path;
+  }
+
   static Future<String> pickAndSaveImage() async {
     final imagePicker = ImagePicker();
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
