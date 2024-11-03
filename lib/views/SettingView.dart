@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:chatgpt_desktop/components/Avatar.dart';
+import 'package:chatgpt_desktop/components/ModelController.dart';
 import 'package:chatgpt_desktop/controller/SettingController.dart';
+import 'package:chatgpt_desktop/entity/Model.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -34,6 +36,8 @@ class SettingView extends StatelessWidget {
 
   FocusNode _bingSearchAccessTokenFocusNode = FocusNode();
   TextEditingController _bingSearchAccessToken_controller = TextEditingController();
+
+  ModelController modelController = Get.put(ModelController());
 
   @override
   Widget build(BuildContext context) {
@@ -417,6 +421,280 @@ class SettingView extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 5,),
+                      Container(
+                        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+                        child: Container(
+                          // 阴影
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                offset: const Offset(0.0, 1.0), //阴影xy轴偏移量
+                                blurRadius: 8.0, //阴影模糊程度
+                                spreadRadius: 0.0, //阴影扩散程度
+                              )
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            // 左对齐
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Custom Model Settings", style: TextStyle(color: textColor, fontSize: 20),),
+                              const SizedBox(height: 10,),
+                              SizedBox(
+                                width: double.infinity,
+                                child: Obx(() => DataTable(
+                                  columns: const [
+                                    DataColumn(label: Text('Display Name')),
+                                    DataColumn(label: Text('Model Name')),
+                                    DataColumn(label: Text('Action')),
+                                  ],
+                                  rows: [
+                                    for(var i = 0; i < modelController.items.length; i++)
+                                    DataRow(cells: [
+                                      DataCell(Text(modelController.items[i].displayName)),
+                                      DataCell(Text(modelController.items[i].name)),
+                                      DataCell(Row(
+                                        children: [
+                                          IconButton(onPressed: (){
+                                            // 弹出对话框，输入模型显示名称和模型名称
+                                            showDialog(context: context, builder: (context) {
+                                              String displayName = modelController.items[i].displayName;
+                                              String modelName = modelController.items[i].name;
+                                              return AlertDialog(
+                                                title: const Text('Edit Model'),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    TextField(
+                                                      decoration: InputDecoration(
+                                                        hintText: 'Please enter the model display name',
+                                                        labelText: 'Model Display Name',
+                                                        border: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: textColor, width: 1),
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      controller: TextEditingController(text: displayName),
+                                                      onChanged: (value){
+                                                        displayName = value;
+                                                      },
+                                                    ),
+                                                    const SizedBox(height: 10,),
+                                                    TextField(
+                                                      decoration: InputDecoration(
+                                                        hintText: 'Please enter the model name',
+                                                        labelText: 'Model Name',
+                                                        border: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: textColor, width: 1),
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      controller: TextEditingController(text: modelName),
+                                                      onChanged: (value){
+                                                        modelName = value;
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: (){
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text('Cancel', style: TextStyle(color: textColor),),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: (){
+                                                      // 判断DisplayName是否有重复
+                                                      for(var j = 0; j < modelController.items.length; j++){
+                                                        if(j == i){
+                                                          continue;
+                                                        }
+                                                        if(modelController.items[j].displayName == displayName){
+                                                          // 弹出框
+                                                          showDialog(context: context, builder: (context) {
+                                                            return AlertDialog(
+                                                              title: const Text('Edit Model'),
+                                                              content: const Text('The model display name already exists.'),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: (){
+                                                                    Navigator.pop(context);
+                                                                  },
+                                                                  child: Text('OK', style: TextStyle(color: textColor),),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          });
+                                                          return;
+                                                        }
+                                                      }
+                                                      if(displayName.isNotEmpty && modelName.isNotEmpty){
+                                                        modelController.items[i].displayName = displayName;
+                                                        modelController.items[i].name = modelName;
+                                                        modelController.update();
+                                                        Util.writeFile('models.json', jsonEncode(modelController.items));
+                                                        Navigator.pop(context);
+                                                      }
+                                                    },
+                                                    child: Text('Edit', style: TextStyle(color: textColor),),
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                          }, icon: Icon(Icons.edit, color: iconColor,),),
+                                          IconButton(onPressed: (){
+                                            if(modelController.items.length == 1){
+                                              // 弹出框
+                                              showDialog(context: context, builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text('Delete Model'),
+                                                  content: const Text('At least one model is required.'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: (){
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('OK', style: TextStyle(color: textColor),),
+                                                    ),
+                                                  ],
+                                                );
+                                              });
+
+                                              return;
+                                            }
+                                            if(modelController.items[i].name == modelController.selectModel.value.name){
+                                              // 弹出框
+                                              showDialog(context: context, builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text('Delete Model'),
+                                                  content: const Text('The selected model cannot be deleted.'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: (){
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('OK', style: TextStyle(color: textColor),),
+                                                    ),
+                                                  ],
+                                                );
+                                              });
+                                              return;
+                                            }
+                                            modelController.items.removeAt(i);
+                                            modelController.update();
+                                            Util.writeFile('models.json', jsonEncode(modelController.items));
+                                          }, icon: Icon(Icons.delete, color: iconColor,),),
+                                        ],
+                                      )),
+                                    ]),
+                                  ],
+                                )),
+                              ),
+                              const SizedBox(height: 10,),
+                              SizedBox(
+                                width: double.infinity,
+                                child: MaterialButton(
+                                  onPressed: (){
+                                    // 弹出对话框，输入模型显示名称和模型名称
+                                    showDialog(context: context, builder: (context) {
+                                      String displayName = '';
+                                      String modelName = '';
+                                      return AlertDialog(
+                                        title: const Text('Add Model'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextField(
+                                              decoration: InputDecoration(
+                                                hintText: 'Please enter the model display name',
+                                                labelText: 'Model Display Name',
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide(color: textColor, width: 1),
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              onChanged: (value){
+                                                displayName = value;
+                                              },
+                                            ),
+                                            const SizedBox(height: 10,),
+                                            TextField(
+                                              decoration: InputDecoration(
+                                                hintText: 'Please enter the model name',
+                                                labelText: 'Model Name',
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide(color: textColor, width: 1),
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              onChanged: (value){
+                                                modelName = value;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: (){
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('Cancel', style: TextStyle(color: textColor),),
+                                          ),
+                                          TextButton(
+                                            onPressed: (){
+                                              // 判断DisplayName是否有重复
+                                              for(var i = 0; i < modelController.items.length; i++){
+                                                if(modelController.items[i].displayName == displayName){
+                                                  // 弹出框
+                                                  showDialog(context: context, builder: (context) {
+                                                    return AlertDialog(
+                                                      title: const Text('Add Model'),
+                                                      content: const Text('The model display name already exists.'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: (){
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text('OK', style: TextStyle(color: textColor),),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  });
+                                                  return;
+                                                }
+                                              }
+                                              if(displayName.isNotEmpty && modelName.isNotEmpty){
+                                                modelController.items.add(Model(displayName: displayName, name: modelName));
+                                                Util.writeFile('models.json', jsonEncode(modelController.items));
+                                                Navigator.pop(context);
+                                              }
+                                            },
+                                            child: Text('Add', style: TextStyle(color: textColor),),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                                  },
+                                  color: iconColor,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.add, color: Colors.white,),
+                                      Text('Add Model', style: TextStyle(color: Colors.white),),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 20,),
                     ],
                   ),
@@ -470,7 +748,7 @@ You can use the custom API provider, and then enter the custom API base URL. For
       ],
     );
   }
-  
+
   Widget buildItem(String name, IconData icon){
     return Container(
       decoration: BoxDecoration(

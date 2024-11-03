@@ -136,7 +136,7 @@ class Chat extends StatelessWidget {
                       }
                     }
 
-                    Util.askGPT(settingController.setting.value.apiSetting.baseUrl,
+                    Util.askGPT(settingController.setting.value.apiSetting.isCustom ? settingController.setting.value.apiSetting.baseUrl : 'https://api.openai.com',
                         model, controller.currentChat.value.temperature,
                         settingController.setting.value.apiSetting.accessToken, plugins, reqMsg, (result, finish) {
                           controller.currentChat.update((val) {

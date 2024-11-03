@@ -194,6 +194,18 @@ class Util{
     if(tools.isNotEmpty){
       requestBody["tools"] = tools;
     }
+    if(basicUrl.isEmpty){
+      callback("BasicUrl is empty, please jump to the API Setting page to make the settings.", true);
+      return;
+    }
+    if(accessKey.isEmpty){
+      callback("AccessKey is empty, please jump to the API Setting page to make the settings.", true);
+      return;
+    }
+    if(model.isEmpty){
+      callback("Model is empty, please select model.", true);
+      return;
+    }
     basicUrl = basicUrl.endsWith('/') ? basicUrl : '$basicUrl/';
     var request = http.Request("POST", Uri.parse('${basicUrl}v1/chat/completions'));
     request.headers["Authorization"] = "Bearer $accessKey";

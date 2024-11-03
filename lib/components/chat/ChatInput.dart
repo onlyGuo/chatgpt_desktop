@@ -1,15 +1,11 @@
-import 'dart:io';
-
 import 'package:bitmap/bitmap.dart';
-import 'package:chatgpt_desktop/enums/ModelEnums.dart';
+import 'package:chatgpt_desktop/components/ModelController.dart';
+import 'package:chatgpt_desktop/entity/Model.dart';
 import 'package:chatgpt_desktop/native_interface/NativeScreenshot.dart';
-import 'package:chatgpt_desktop/native_interface/WXDLL.dart';
 import 'package:chatgpt_desktop/utils/Util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:screen_capturer/screen_capturer.dart';
-// import 'package:chatgpt_desktop/utils/MyScreen_captuer.dart';
 
 class ChatInput extends StatelessWidget{
   InputFinish? onFinish;
@@ -18,9 +14,10 @@ class ChatInput extends StatelessWidget{
   TextEditingController controller = TextEditingController();
   FocusNode focusNode = FocusNode();
 
-
-  var selectModel = ModelEnums.models.first.obs;
+  ModelController modelController = Get.put(ModelController());
   var selectedImage = ''.obs;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +29,7 @@ class ChatInput extends StatelessWidget{
     //     controller.clear();
     //   }
     // });
-    
+
     return Container(
       color: const Color.fromARGB(255, 252, 252, 252),
       height: 180,
@@ -94,8 +91,8 @@ class ChatInput extends StatelessWidget{
                 }, icon: Icon(Icons.cut), tooltip: 'Cut'),
                 Expanded(child: Container()),
                 Obx(() => DropdownButton<Model>(
-                  value: selectModel.value,
-                  items: ModelEnums.models
+                  value: modelController.selectModel.value,
+                  items: modelController.items
                       .map((Model value) {
                     return DropdownMenuItem<Model>(
                       value: value,
@@ -104,7 +101,8 @@ class ChatInput extends StatelessWidget{
                   }).toList(),
                   underline: Container(),
                   onChanged: (newValue) {
-                    selectModel.value = newValue!;
+                    modelController.selectModel.value = newValue!;
+                    modelController.update();
                   },
                 )),
 
@@ -119,47 +117,26 @@ class ChatInput extends StatelessWidget{
             ),
           ),
           Expanded(
-              child: Column(
-                children: [
-                  Obx(() => selectedImage.value.isEmpty ? Container() : Container(
-                    height: 50,
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    // color: Colors.red,
-                    child: Row(
-                      children: [
-                        showSelectedImage(),
-                      ],
-                    )
-                  )),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        Container(
-                          // padding: const EdgeInsets.all(5),
-                          // color: Colors.red,
-                          child: RawKeyboardListener(
-                            focusNode: focusNode,
-                            onKey: handleKeyPress,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                hintText: 'Type a message, press Enter to send, press Shift+Enter to newline.',
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              style: const TextStyle(
-                                fontSize: 12,
-                              ),
-                              maxLines: null,
-                              minLines: 1,
-                              controller: controller,
-                            ),
-                          ),
-                        )
-                      ],
+              child: Container(
+                // padding: const EdgeInsets.all(5),
+                // color: Colors.red,
+                child: RawKeyboardListener(
+                  focusNode: focusNode,
+                  onKey: handleKeyPress,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Type a message, press Enter to send, press Shift+Enter to newline.',
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
                     ),
+                    style: const TextStyle(
+                      fontSize: 12,
+                    ),
+                    maxLines: 5,
+                    controller: controller,
                   ),
-                ]
+                ),
               ),
           )
         ],
@@ -184,44 +161,10 @@ class ChatInput extends StatelessWidget{
         String text = controller.text;
         controller.clear();
         if (onFinish != null) {
-          onFinish!(text, selectModel.value.name);
+          onFinish!(text, modelController.selectModel.value.name);
         }
       }
     }
-  }
-
-  Widget showSelectedImage(){
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.all(3),
-      // 边框圆角，超出部分隐藏
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.withOpacity(0.5)),
-      ),
-      child: Row(
-        // 显示图片和删除按钮，图片cover显示
-        children: [
-          Image.file(File(selectedImage.value), width: 44, height: 44, fit: BoxFit.cover,),
-          const SizedBox(width: 5,),
-          // 按钮小一些
-          SizedBox(
-            height: 18,
-            width: 18,
-            child: IconButton(
-              onPressed: (){
-                selectedImage.value = '';
-              },
-              padding: EdgeInsets.zero,
-              icon: Icon(Icons.close),
-              iconSize: 12,
-              tooltip: "Delete the image",
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
