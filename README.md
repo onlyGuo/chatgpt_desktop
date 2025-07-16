@@ -25,7 +25,7 @@ GPTCraft is a cross-platform ChatGPT client developed in Flutter, designed to pr
 <img alt="code style" src="https://raw.githubusercontent.com/onlyGuo/chatgpt_desktop/main/docs/img/windows.png"/>
 
 ## Features
-- Cross-platform support: Developed using Flutter, it can run on both iOS and Android devices.
+- Cross-platform support: Developed using Flutter, it can run on both MacOS and Windows devices.
 - Integration with ChatGPT model: Users can engage in real-time conversations with ChatGPT through GPTCraft.
 - User-friendly interface: A clean and intuitive user interface that allows users to interact effortlessly.
 
